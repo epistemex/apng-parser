@@ -16,10 +16,11 @@ Features
 - Provide frames as raw frames (regions, offsets preserved).
 - Provide frames as rendered (via the helper)
 - Helper can render individual frames to canvas
-- Helper can play forward as well as non-standard backward and ping-pong
-- Helper can generate full-frame sprite-sheets for efficient animations
+- Helper can play *forward* as well as non-standard *backward* and *ping-pong*
+- Helper can generate full-frame sprite-sheets for efficient animations and debugging
 - Non-blocking and asynchronous
 - Fast and easy to use.
+
 
 Usage
 -----

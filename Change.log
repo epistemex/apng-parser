@@ -1,6 +1,10 @@
 Change log for apng-parser
 --------------------------
 
+0.2.0
+ADD: isAPNG public property to check if source is actually a animated PNG.
+CHG: internal refactoring.
+
 0.1.1
 CHG: Internals
 

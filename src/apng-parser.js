@@ -1,5 +1,5 @@
 /*!
-	APNG Parser ver 0.1.1 alpha
+	APNG Parser ver 0.2.0 alpha
 	Copyright (c) 2017 Epistemex
 	www.epistemex.com
 	License: CC BY-NC-SA 4.0
@@ -12,17 +12,23 @@
  * used for "manual" animation, frame extraction, analyze and optimization
  * purposes.
  *
+ * The parsing is asynchronous and require a callback function. Callback
+ * for errors is optional.
+ *
  * @param {ArrayBuffer|String|Blob|File} input - URL to a APNG file, or a Blob/File object, or a pre-filled ArrayBuffer holding a APNG file.
- * @param {Function} callback - callback function invoked when all parsing and conversion is done. The call is asynchronous.
+ * @param {Function} callback - callback function invoked when all parsing and conversion is done. `this` represents the current instance.
  * @param {Function} [onerror] - error callback.
  * @constructor
  */
 function APNGParser(input, callback, onerror) {
 
-  var me = this, table, fr;
+  var me = this,
+      table,
+      fileReader,
+      mimeType = {type: "image/png"};
 
-  if (callback) callback = callback.bind(me);
-  else callback = function() {console.log("No callback provided.")};
+  // bind callback for "this"
+  callback = callback.bind(me);
 
   /**
    * Width of animation in pixels
@@ -59,6 +65,12 @@ function APNGParser(input, callback, onerror) {
    */
   this.frameInfo = [];
 
+  /**
+   * Check if the source is actually a animated PNG.
+   * @type {boolean}
+   */
+  this.isAPNG = false;
+
   /*--------------------------------------------------------------------
 
       VERIFY AND CONVERT (IF NEEDED) INPUT TYPE
@@ -66,11 +78,11 @@ function APNGParser(input, callback, onerror) {
   --------------------------------------------------------------------*/
 
   if (input instanceof Blob || input instanceof File) {
-    fr = new FileReader();
-    fr.onloadend = function() {
+    fileReader = new FileReader();
+    fileReader.onloadend = function() {
       parseBuffer(input);
     };
-    fr.readAsArrayBuffer(input)
+    fileReader.readAsArrayBuffer(input)
   }
   else if (typeof input === "string") {
     fetch(input).then(function(resp) {return resp.arrayBuffer()}).then(parseBuffer);
@@ -126,14 +138,15 @@ function APNGParser(input, callback, onerror) {
 
     if (isAPNG) {
 
-      var parts = null,
-          firstFC = false,
-          files = [],
-          header = [],
-          headerChunks = [                                              // chunks we want to bring over to each individual PNG file
+      me.isAPNG = true;                                                 // make public property
+
+      var parts = null,                                                 // image data parts (IDAT, fdAT) for each file
+          fctlBeforeIDAT = false,                                       // for IDAT chunk, if true IDAT is part of anim.
+          files = [],                                                   // data separated for each PNG file
+          header = [],                                                  // common headers for each file (will have modified IDAT)
+          headerChunks = [  // chunks we want to bring over to each individual PNG file
             "IHDR", "PLTE", "gAMA", "pHYs", "tRNS", "iCCP", "sRGB", "sBIT", "sPLT"
-          ],
-          data;
+          ];
 
       // Iterate over each chunk to extract animation data
       chunks.forEach(function(chunk) {
@@ -152,55 +165,54 @@ function APNGParser(input, callback, onerror) {
 
         // Frame control chunk hold offset, region size and timing data
         else if (chunk.name === "fcTL") {
-          if (parts) files.push(parts);
-          parts = [];
-          firstFC = true;
-          pos = chunk.pos + 4;
+          if (parts) files.push(parts);                                 // push previous parts if any
+          parts = [];                                                   // initialize for new parts
+          fctlBeforeIDAT = true;
+          pos = chunk.pos + 4;                                          // skip sequence no.
           me.frameInfo.push({
             width: getU32(),
             height: getU32(),
             x: getU32(),
             y: getU32(),
-            delay: getU16() / (getU16() || 1) * 1000,
+            delay: getU16() / (getU16() || 1) * 1000,                   // convert to ms.
             dispose: getU8(),
             blend: getU8()
           });
 
-          // correct the time if denominator = 0
+          // correct the time if denominator === 0, as per specs
           if (view.getUint16(pos - 4) === 0)
             me.frameInfo[me.frameInfo.length - 1].delay = 10;
+
         }
 
-        // A regular IDAT, if preceeded by a fcTL chunk it is considered part of the animation
+        // A regular IDAT, if preceded by a fcTL chunk it is considered part of the animation
         else if (chunk.name === "IDAT") {
-          if (firstFC) {                                                // incl. IDAT only if preceded by a fcTL chunk
-            data = new Uint8Array(view.buffer, chunk.pos, chunk.size);
-            parts.push(data);
+          if (fctlBeforeIDAT) {
+            parts.push(new Uint8Array(view.buffer, chunk.pos, chunk.size));
           }
         }
 
         // Image data for frame, holds sequence number (ignored) followed by regular IDAT image data
         else if (chunk.name === "fdAT") {
-          data = new Uint8Array(view.buffer, chunk.pos + 4, chunk.size - 4);
-          parts.push(data);
+          parts.push(new Uint8Array(view.buffer, chunk.pos + 4, chunk.size - 4));
         }
       });
 
       // add final part
       if (parts) files.push(parts);
 
-      // check first frame dispose method
+      // if first frame's dispose method is 2 then use 1, as per specs
       if (me.frameInfo[0].dispose === 2)
         me.frameInfo[0].dispose = 1;
-
-      // create a CRC32 LUT
-      table = buildCRC();
 
       /*--------------------------------------------------------------------
 
           BUILD BLOBS REPRESENTING EACH FRAME AS A (PRODUCED) PNG FILE
 
       --------------------------------------------------------------------*/
+
+      // create a CRC32 LUT
+      table = buildCRC();
 
       files.forEach(function(file, index) {
 
@@ -216,13 +228,15 @@ function APNGParser(input, callback, onerror) {
         // Copy each base chunks into new blob
         header.forEach(function(chunk) {
 
+          var dv, ihdr;
+
           // We need to reflect region size in the IHDR and recalculate CRC32
           if (chunk.name === "IHDR") {
-            var data8 = new Uint8Array(view.buffer, chunk.pos, chunk.size);
-            var dv = new DataView(view.buffer, chunk.pos, chunk.size);
+            dv = new DataView(view.buffer, chunk.pos, chunk.size);
             dv.setUint32(0, info.width);
             dv.setUint32(4, info.height);
-            var ihdr = makeChunk("IHDR", data8);
+
+            ihdr = makeChunk("IHDR", new Uint8Array(view.buffer, chunk.pos, chunk.size));
             list.push(ihdr);
           }
 
@@ -232,13 +246,14 @@ function APNGParser(input, callback, onerror) {
           }
         });
 
-        // Image data chunks data added, converted to IDAT and with new CRC32
+        // Image data chunks (can be multiple per file) data added, converted to IDAT with new CRC32
+        // Can also be merged into a single chunk but need more temp memory and is slower due to the additional copy process.
         file.forEach(function(part) {
           list.push(makeChunk("IDAT", part));
         });
 
         // push final IEND chunk
-        list.push(new Uint8Array([0, 0, 0, 0, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82]));
+        list.push(new Uint32Array([0, 0x444e4549, 0x826042ae]));
 
         /*--------------------------------------------------------------------
 
@@ -246,27 +261,29 @@ function APNGParser(input, callback, onerror) {
 
         --------------------------------------------------------------------*/
 
-        blob = new Blob(list, {type: "image/png"});
-        url = URL.createObjectURL(blob);
+        blob = new Blob(list, mimeType);                                // merge part list into a single blob
+        list = null;                                                    // lets hope GC can kick in due to async loading below
+        url = URL.createObjectURL(blob);                                // temp. URL for image
 
         img = new Image;
-        img.onload = function() {
+        img.onload = loadHandler;
+        img.onerror = errorHandler;
+        img.src = url;
+
+        me.frames.push(img);                                            // Add final image to frame Array
+
+        function loadHandler() {
           URL.revokeObjectURL(this.src);
           if (index === frames - 1) callback();                         // DONE!
-        };
+        }
 
-        img.onerror = function() {
-          console.log("Error creating PNG from frame.");
+        function errorHandler() {
           if (onerror) {
-            onerror("Internal error loading produced PNG")
+            onerror("Internal error producing PNG.")
           }
           else if (index === frames - 1)
             callback();
-        };
-        img.src = url;
-
-        // Add image to frame Array
-        me.frames.push(img);
+        }
       });
 
     }
@@ -274,7 +291,7 @@ function APNGParser(input, callback, onerror) {
 
       /*--------------------------------------------------------------------
 
-          IS A REGULAR PNG, REPORT IT AS A SINGLE FRAME
+          IT'S A REGULAR PNG, STORE IT AS A SINGLE FRAME
 
       --------------------------------------------------------------------*/
 
@@ -292,7 +309,7 @@ function APNGParser(input, callback, onerror) {
         });
         callback();
       };
-      me.frames[0].src = URL.createObjectURL(new Blob([buffer], {type: "image/png"}))
+      me.frames[0].src = URL.createObjectURL(new Blob([buffer], mimeType))
     }
 
     /*--------------------------------------------------------------------

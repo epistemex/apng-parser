@@ -98,9 +98,9 @@
     
     <div class="description">
         <p>Helper object to animate parsed APNG files (APNGParser objects).</p>
-<p>The animation is &quot;intelligent&quot; so if a delay is close to 60 FPS it
-will use the optimized requestAnimationFrame. The loop can also be
-overridden via option to only use this method.</p>
+<p>The animation is &quot;intelligent&quot; so if a delay is close to 60 FPS (16-17ms)
+it will use the optimized <code>requestAnimationFrame()</code>. The loop can also be
+overridden via option to force use of this method for all frames.</p>
     </div>
     
 
@@ -371,7 +371,7 @@ overridden via option to only use this method.</p>
                 </td>
             
 
-            <td class="description last"><p>override timing and force use of <code>requestAnimationFrame()</code> internally.</p></td>
+            <td class="description last"><p>override timing and force use of <code>requestAnimationFrame()</code> for all frames.</p></td>
         </tr>
 
     
@@ -664,6 +664,77 @@ is actually drawn to the canvas itself.</p>
             <li>
                 
 <span class="param-type">Number</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id="mode">
+    <h4><span class="type-signature"></span>mode<span class="type-signature"> :String</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Set or get current playback mode.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
 
 
 

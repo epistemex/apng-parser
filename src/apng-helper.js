@@ -1,27 +1,31 @@
 /*!
-	APNG Animation Helper ver 0.1.1 alpha
+	APNG Animation Helper ver 0.2.0 alpha
 	Copyright (c) 2017 Epistemex
 	www.epistemex.com
 	License: CC BY-NC-SA 4.0
 */
 
+"use strict";
+
 /**
  * Helper object to animate parsed APNG files (APNGParser objects).
  *
- * The animation is "intelligent" so if a delay is close to 60 FPS it
- * will use the optimized requestAnimationFrame. The loop can also be
- * overridden via option to only use this method.
+ * The animation is "intelligent" so if a delay is close to 60 FPS (16-17ms)
+ * it will use the optimized `requestAnimationFrame()`. The loop can also be
+ * overridden via option to force use of this method for all frames.
  *
  * @param {HTMLCanvasElement} canvas - canvas to use. The correct size will be set internally.
  * @param {APNGParser} apng - APNGParser object to animate
  * @param {*} [options] - options for animation
  * @param {Number} [options.iterations=-1] - number of iterations. If > -1 it will override the original number of iterations
  * @param {Boolean} [options.ignoreIterations=true] - will loop indefinitely if true (default), otherwise number of iterations is considered.
- * @param {Boolean} [options.forceRequestAnimationFrame=false] - override timing and force use of `requestAnimationFrame()` internally.
+ * @param {Boolean} [options.forceRequestAnimationFrame=false] - override timing and force use of `requestAnimationFrame()` for all frames.
  * @param {String} [options.mode="forward"] - playback mode: forward, backward, ping-pong. NOTE: These modes are not part of the Animation PNG standard.
  * @constructor
  */
 function APNGHelper(canvas, apng, options) {
+
+  // todo: in future versions *all* frames should go through rAF using deltas
 
   options = Object.assign({
     iterations                : -1,
@@ -43,19 +47,6 @@ function APNGHelper(canvas, apng, options) {
       ref,
       commit = true,
       play = false;
-
-  // Playback mode -  todo: make public method for this
-  frames = apng.frames.concat();
-  frameInfo = apng.frameInfo.concat();
-
-  if (options.mode === "backward") {
-    frames.reverse();
-    frameInfo.reverse();
-  }
-  else if (options.mode === "pingpong") {
-    frames = frames.concat(frames.concat().reverse());
-    frameInfo = frameInfo.concat(frameInfo.concat().reverse());
-  }
 
   /**
    * The 2D context used for the canvas internally.
@@ -113,16 +104,31 @@ function APNGHelper(canvas, apng, options) {
    */
   this.oniteration = null;
 
-  canvas.width = temp.width = apng.width;
-  canvas.height = temp.height = apng.height;
+  /**
+   * Set or get current playback mode.
+   * @member {String} APNGHelper#mode
+   */
+  Object.defineProperty(me, "mode", {
+    get: function() {return options.mode},
+    set: function(mode) {
 
-  iterations = options.iterations < 0 ? apng.iterations : options.iterations;
+      frames = apng.frames.concat();
+      frameInfo = apng.frameInfo.concat();
 
-  if (!iterations) options.ignoreIterations = true;
-  else if (iterations < 0) {
-    options.ignoreIterations = false;
-    iterations = 0;
-  }
+      if (mode === "backward") {
+        frames.reverse();
+        frameInfo.reverse();
+      }
+      else if (mode === "pingpong") {
+        frames = frames.concat(frames.concat().reverse());
+        frameInfo = frameInfo.concat(frameInfo.concat().reverse());
+      }
+
+      // Make sure we are within the new length
+      if (cFrame >= frames.length) cFrame = 0;
+      options.mode = mode;
+    }
+  });
 
   /**
    * Gets the current frame. To set current frame use `gotoFrame()`.
@@ -272,6 +278,27 @@ function APNGHelper(canvas, apng, options) {
   function getEvent() {
     return {timeStamp: Date.now(), context: ctx, target: me}
   }
+
+  /*--------------------------------------------------------------------
+
+      SETUP AND INITIALIZATIONS
+
+  --------------------------------------------------------------------*/
+
+  // Initialize main + internal (dispose 2 mode) canvas
+  canvas.width = temp.width = apng.width;
+  canvas.height = temp.height = apng.height;
+
+  iterations = options.iterations < 0 ?                                 // if option no. < 0 then ignore option and use original
+                 apng.iterations : options.iterations;
+
+  if (!iterations) options.ignoreIterations = true;                     // 0 means infinite iterations
+  else if (iterations < 0) {                                            // if we still have -1 (single frame from original PNG)
+    options.ignoreIterations = !!(iterations = 0);                      // don't ignore iterations, but use 0 so we only render one frame and stop
+  }
+
+  // Init playback mode (!)
+  me.mode = options.mode;                                               // this call also sets up frames/info arrays
 }
 
 /**

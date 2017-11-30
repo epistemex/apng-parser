@@ -100,6 +100,8 @@
         <p>Parses a Animated PNG (APNG) into raw frames (images) which can be
 used for &quot;manual&quot; animation, frame extraction, analyze and optimization
 purposes.</p>
+<p>The parsing is asynchronous and require a callback function. Callback
+for errors is optional.</p>
     </div>
     
 
@@ -202,7 +204,7 @@ purposes.</p>
 
             
 
-            <td class="description last"><p>callback function invoked when all parsing and conversion is done. The call is asynchronous.</p></td>
+            <td class="description last"><p>callback function invoked when all parsing and conversion is done. <code>this</code> represents the current instance.</p></td>
         </tr>
 
     
@@ -482,6 +484,77 @@ method and blend operation.</p>
             <li>
                 
 <span class="param-type">number</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id="isAPNG">
+    <h4><span class="type-signature"></span>isAPNG<span class="type-signature"> :boolean</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Check if the source is actually a animated PNG.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">boolean</span>
 
 
 
