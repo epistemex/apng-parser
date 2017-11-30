@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test APNG loader</title>
+</head>
+<body>
+
+  <canvas id=c></canvas>
+
+<script src="../src/apng-parser.js"></script>
+<script src="../src/apng-helper.js"></script>
+<script>
+
+  var anim, apng = new APNGParser("gfx/testanim_optimized.png", function() {
+
+    // inspect object in console (F12)
+    console.log(this);
+
+    // Create an animation helper and play
+    anim = new APNGHelper(c, apng, {ignoreIterations: true});
+    anim.play();
+
+    // Generate a sprite-sheet for demo - this can be used instead of
+    // animation helper and could be more efficient as each frame is
+    // pre-rendered.
+    document.body.appendChild(APNGHelper.toSpritesheet(apng, {
+      drawCallback: frameNumberOverlay, // for demo only
+      maxWidth: 4600
+    }));
+  });
+
+  // Example callback for the animhelper's onframe callback
+  // (for the sprite-sheet in this case).
+  var i = 0;
+  function frameNumberOverlay(e) {
+    e.context.fillStyle = "#fff";
+    e.context.font = "20px sans-serif";
+    e.context.fillText(i++, 10, 20);
+  }
+</script>
+</body>
+</html>
