@@ -1,5 +1,5 @@
 /*!
-	APNG Parser ver 0.4.0 alpha
+	APNG Parser ver 0.5.0 alpha
 	Copyright (c) 2017 Epistemex.com
 	License: CC BY-NC-SA 4.0
 */
@@ -51,7 +51,13 @@ APNG.Parser = function(input, callback, onerror) {
    * Number of iterations (loops) defined in animation header chunk.
    * @type {number}
    */
-  this.iterations = 0;
+  this.iterations =
+
+  /**
+   * Duration of animation in milliseconds.
+   * @type {number}
+   */
+  this.duration = 0;
 
   /**
    * Holds Image object (PNG) representing each raw frame.
@@ -126,7 +132,7 @@ APNG.Parser = function(input, callback, onerror) {
       var chunk = {
         size: getU32(),
         name: getFourCC(),
-        pos: pos
+        pos : pos
       };
       chunks.push(chunk);
 
@@ -144,9 +150,10 @@ APNG.Parser = function(input, callback, onerror) {
 
       var parts = null,                                                 // image data parts (IDAT, fdAT) for each file
           fctlBeforeIDAT = false,                                       // for IDAT chunk, if true IDAT is part of anim.
+          duration = 0,                                                 // track total duration
           files = [],                                                   // data separated for each PNG file
           header = [],                                                  // common headers for each file (will have modified IDAT)
-          headerChunks = [  // chunks we want to bring over to each individual PNG file
+          headerChunks = [                                              // chunks we want to bring over to each individual PNG file
             "IHDR", "PLTE", "gAMA", "pHYs", "tRNS", "iCCP", "sRGB", "sBIT", "sPLT"
           ];
 
@@ -172,19 +179,21 @@ APNG.Parser = function(input, callback, onerror) {
           fctlBeforeIDAT = true;
           pos = chunk.pos + 4;                                          // skip sequence no.
           me.frameInfo.push({
-            width: getU32(),
-            height: getU32(),
-            x: getU32(),
-            y: getU32(),
-            delay: getU16() / (getU16() || 1) * 1000,                   // convert to ms.
+            width  : getU32(),
+            height : getU32(),
+            x      : getU32(),
+            y      : getU32(),
+            delay  : getU16() / (getU16() || 1) * 1000,                   // convert to ms.
             dispose: getU8(),
-            blend: getU8()
+            blend  : getU8()
           });
 
           // correct the time if denominator === 0, as per specs
           if (view.getUint16(pos - 4) === 0)
             me.frameInfo[me.frameInfo.length - 1].delay = 10;
 
+          // add to duration
+          duration += me.frameInfo[me.frameInfo.length - 1].delay;
         }
 
         // A regular IDAT, if preceded by a fcTL chunk it is considered part of the animation
@@ -199,6 +208,9 @@ APNG.Parser = function(input, callback, onerror) {
           parts.push(new Uint8Array(view.buffer, chunk.pos + 4, chunk.size - 4));
         }
       });
+
+      // publish duration
+      me.duration = duration;
 
       // add final part
       if (parts) files.push(parts);
@@ -301,13 +313,13 @@ APNG.Parser = function(input, callback, onerror) {
       me.frames[0].onload = function() {
         URL.revokeObjectURL(this.src);
         me.frameInfo.push({
-          x: 0,
-          y: 0,
-          width: me.width,
-          height: me.height,
-          delay: -1,
+          x      : 0,
+          y      : 0,
+          width  : me.width,
+          height : me.height,
+          delay  : -1,
           dispose: 1,
-          blend: 0
+          blend  : 0
         });
         callback();
       };

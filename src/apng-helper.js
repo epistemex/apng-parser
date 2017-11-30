@@ -1,5 +1,5 @@
 /*
-	APNG Animation Helper ver 0.4.0 alpha
+	APNG Animation Helper ver 0.5.0 alpha
 	Copyright (c) 2017 Epistemex
 	License: CC BY-NC-SA 4.0
 */
@@ -195,17 +195,12 @@ APNG.Helper = function(canvas, apng, options) {
 
   /**
    * Get the duration of the entire animation in milliseconds.
-   * The duration considers playback mode.
+   * The duration considers playback mode. This is a convenience property
+   * which wraps the APNG Parser object's duration property.
    *
    * @member {Number} APNG.Helper#duration
    */
-  defProp("duration",
-    function() {
-      var duration = 0;
-      frameInfo.forEach(function(info) {duration += info.delay});
-      return duration
-    }
-  );
+  defProp("duration", function() {return apng.duration});
 
   /**
    * This property can be set to false when for example the canvas is not

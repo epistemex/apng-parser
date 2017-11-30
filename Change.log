@@ -1,22 +1,26 @@
 Change log for apng-parser
 --------------------------
 
+0.5.0
+ADD: [parser] duration of animation in ms.
+CHG: [helper] duration property wraps Parser property (for convenience).
+
 0.4.0
-ADD: duration (of animation) in ms.
-ADD: currentTime (get/set) in ms.
+ADD: [helper] duration of animation in ms.
+ADD: [helper] currentTime (get/set) in ms.
 FIX: [helper] commit property called old gotoFrame.
 
 0.3.0
 CHG: APNGParser, APNGHelper objects moved to new namespace as Parser and Helper
 REM: [helper] gotoFrame() is removed
-CHG: gotoFrame() is replaced by setter for property currentFrame instead
+CHG: [helper] gotoFrame() is replaced by setter for property currentFrame instead
 
 0.2.0
-ADD: isAPNG public property to check if source is actually a animated PNG.
+ADD: [parser] isAPNG public property to check if source is actually a animated PNG.
 CHG: internal refactoring.
 
 0.1.1
-CHG: Internals
+CHG: Internal refactoring.
 
 0.1.0
 NEW: Initial release
