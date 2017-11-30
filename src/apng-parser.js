@@ -1,5 +1,5 @@
 /*!
-	APNG Parser ver 0.1.0 alpha
+	APNG Parser ver 0.1.1 alpha
 	Copyright (c) 2017 Epistemex
 	www.epistemex.com
 	License: CC BY-NC-SA 4.0
@@ -198,7 +198,7 @@ function APNGParser(input, callback, onerror) {
 
       /*--------------------------------------------------------------------
 
-          BUILD BLOBS REPRESETING EACH FRAME AS A (PRODUCED) PNG FILE
+          BUILD BLOBS REPRESENTING EACH FRAME AS A (PRODUCED) PNG FILE
 
       --------------------------------------------------------------------*/
 
@@ -250,7 +250,6 @@ function APNGParser(input, callback, onerror) {
         url = URL.createObjectURL(blob);
 
         img = new Image;
-
         img.onload = function() {
           URL.revokeObjectURL(this.src);
           if (index === frames - 1) callback();                         // DONE!
@@ -347,21 +346,11 @@ function APNGParser(input, callback, onerror) {
   function makeChunk(name, data) {
 
     var chunk = new Uint8Array(data.length + 12),
-      dv = new DataView(chunk.buffer),
-      tmp;
+        dv = new DataView(chunk.buffer);
 
     dv.setUint32(0, data.length);
     dv.setUint32(4, makeFourCC(name));
-
-    if (typeof data === "string") {
-      tmp = new Uint8Array(data.length);
-      for(var i = 0; i < data.length; i++) tmp[i] = data.charCodeAt(i) & 0xff;
-      dv.setUint8(i + 8, data.charCodeAt(i) & 0xff);
-      data = tmp;
-    }
-
-    if (data.length) chunk.set(data, 8);
-
+    chunk.set(data, 8);
     dv.setUint32(chunk.length - 4, calcCRC(chunk));
 
     function makeFourCC(n) {

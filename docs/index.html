@@ -119,8 +119,8 @@ frame and animation information.</p>
 <pre class="prettyprint source"><code>var anim = new APNGHelper(canvas, apng, options);
 anim.play();                    // play, stop, pause
 anim.gotoFrame(n);              // renders a full frame correctly
-anim.onframe = function() {     // various callbacks available
-  // render overlay
+anim.onframe = function(e) {    // various callbacks available
+  // render overlay via e.context
 };</code></pre><p>See included HTML documentation for details.</p>
 <h2>Issues</h2><p>See the <a href="https://gitlab.com/epistemex/apng-parser/issues">issue tracker</a> for details.</p>
 <h2>License</h2><p><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">Attribution-NonCommercial-ShareAlike 4.0 International</a></p>

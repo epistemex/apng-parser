@@ -45,9 +45,9 @@ You can animate it manually, or use the included `APNGHelper` object:
 
     var anim = new APNGHelper(canvas, apng, options);
     anim.play();                    // play, stop, pause
-    anim.gotoFrame(n);  			// renders a full frame correctly
-    anim.onframe = function() {     // various callbacks available
-      // render overlay
+    anim.gotoFrame(n);              // renders a full frame correctly
+    anim.onframe = function(e) {    // various callbacks available
+      // render overlay via e.context
     };
 
 See included HTML documentation for details.

@@ -1,0 +1,4 @@
+docs/* linguist-vendored
+/*.md linguist-vendored
+/*.log linguist-vendored
+/*.txt linguist-vendored

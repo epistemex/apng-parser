@@ -1,7 +1,8 @@
 /*!
-	APNG Animation Helper ver 0.1.0 alpha
+	APNG Animation Helper ver 0.1.1 alpha
 	Copyright (c) 2017 Epistemex
 	www.epistemex.com
+	License: CC BY-NC-SA 4.0
 */
 
 /**
@@ -23,10 +24,10 @@
 function APNGHelper(canvas, apng, options) {
 
   options = Object.assign({
-    iterations: -1,
-    ignoreIterations: true,
+    iterations                : -1,
+    ignoreIterations          : true,
     forceRequestAnimationFrame: false,
-    mode: "forward"
+    mode                      : "forward"
   }, options);
 
   var me = this,
@@ -38,12 +39,12 @@ function APNGHelper(canvas, apng, options) {
       clrBg = false,
       temp = document.createElement("canvas"),
       ctxt = temp.getContext("2d"),
+      ctx = canvas.getContext("2d"),
       ref,
       commit = true,
-      play = false,
-      ctx = canvas.getContext("2d");
+      play = false;
 
-  // Playback mode
+  // Playback mode -  todo: make public method for this
   frames = apng.frames.concat();
   frameInfo = apng.frameInfo.concat();
 
@@ -68,21 +69,21 @@ function APNGHelper(canvas, apng, options) {
    * @type {Function|Null}
    * @fires APNGHelper#event
    */
-  this.onplay = null;
+  this.onplay =
 
   /**
    * Optional callback for when an animation is stopped.
    * @type {Function|Null}
    * @fires APNGHelper#event
    */
-  this.onstop = null;
+  this.onstop =
 
   /**
    * Optional callback for when an animation starts is paused.
    * @type {Function|Null}
    * @fires APNGHelper#event
    */
-  this.onpause = null;
+  this.onpause =
 
   /**
    * Optional callback for when an animation ended (based on number of
@@ -90,7 +91,7 @@ function APNGHelper(canvas, apng, options) {
    * @type {Function|Null}
    * @fires APNGHelper#event
    */
-  this.onend = null;
+  this.onend =
 
   /**
    * Optional callback that is called for each rendered frame.
@@ -103,7 +104,7 @@ function APNGHelper(canvas, apng, options) {
    * @type {Function|Null}
    * @fires APNGHelper#event
    */
-  this.onframe = null;
+  this.onframe =
 
   /**
    * Optional callback for when a new iteration is started.
