@@ -1,7 +1,6 @@
-/*!
-	APNG Animation Helper ver 0.3.0 alpha
+/*
+	APNG Animation Helper ver 0.4.0 alpha
 	Copyright (c) 2017 Epistemex
-	www.epistemex.com
 	License: CC BY-NC-SA 4.0
 */
 
@@ -35,6 +34,8 @@ APNG.Helper = function(canvas, apng, options) {
   }, options);
 
   var me = this,
+      startTime = -1,
+      currentTime = 0,
       frames,
       frameInfo,
       cFrame = 0,
@@ -108,9 +109,9 @@ APNG.Helper = function(canvas, apng, options) {
    * Set or get current playback mode.
    * @member {String} APNGHelper#mode
    */
-  Object.defineProperty(me, "mode", {
-    get: function() {return options.mode},
-    set: function(mode) {
+  defProp("mode",
+    function() {return options.mode},
+    function(mode) {
 
       frames = apng.frames.concat();
       frameInfo = apng.frameInfo.concat();
@@ -128,7 +129,7 @@ APNG.Helper = function(canvas, apng, options) {
       if (cFrame >= frames.length) cFrame = 0;
       options.mode = mode;
     }
-  });
+  );
 
   /**
    * Gets the current frame number.
@@ -146,9 +147,9 @@ APNG.Helper = function(canvas, apng, options) {
    *
    * @member {Number} APNG.Helper#currentFrame
    */
-  Object.defineProperty(this, "currentFrame", {
-    get: function() {return cFrame},
-    set: function gotoFrame(frame) {
+  defProp("currentFrame",
+    function() {return cFrame},
+    function(frame) {
       var i = 0;
 
       if (frame < 0) frame = 0;
@@ -164,7 +165,47 @@ APNG.Helper = function(canvas, apng, options) {
 
       if (me.onframe) me.onframe(getEvent());
     }
-  });
+  );
+
+
+  /**
+   * Sets or gets the current time in milliseconds.
+   * If playing the time is accurate, if paused or stopped the current
+   * time represents the closest frame.
+   *
+   * Setting time will set the frame which the time falls within.
+   *
+   * @member {Number} APNG.Helper#currentTime
+   */
+  defProp("currentTime",
+    function() {return play ? performance.now() - startTime : currentTime - startTime},
+    function(time) {
+      var i = 0, delta = 0;
+      while(i < frameInfo.length) {
+        delta += frameInfo[i].delay;
+        if (delta >= time) {
+          me.currentFrame = i;
+          if (me.onframe) me.onframe(getEvent());
+          return;
+        }
+        i++
+      }
+    }
+  );
+
+  /**
+   * Get the duration of the entire animation in milliseconds.
+   * The duration considers playback mode.
+   *
+   * @member {Number} APNG.Helper#duration
+   */
+  defProp("duration",
+    function() {
+      var duration = 0;
+      frameInfo.forEach(function(info) {duration += info.delay});
+      return duration
+    }
+  );
 
   /**
    * This property can be set to false when for example the canvas is not
@@ -174,14 +215,14 @@ APNG.Helper = function(canvas, apng, options) {
    * Note: This also blocks calls to onframe callbacks.
    * @member {boolean} APNG.Helper#commit
    */
-  Object.defineProperty(this, "commit", {
-    get: function() {return commit},
-    set: function(state) {
+  defProp("commit",
+    function() {return commit},
+    function(state) {
       var prevState = commit;
       commit = !!state;
-      if (!prevState && commit) me.gotoFrame(cFrame);
+      if (!prevState && commit) me.currentFrame = cFrame;
     }
-  });
+  );
 
   /**
    * Start playing animation from current frame. If iterations is
@@ -206,6 +247,7 @@ APNG.Helper = function(canvas, apng, options) {
 
       if (++cFrame >= frames.length) {
         cFrame = 0;
+        startTime = performance.now();
         loops++;
         if (me.oniteration) me.oniteration(getEvent());
         if (loops >= iterations && !options.ignoreIterations) {
@@ -214,8 +256,11 @@ APNG.Helper = function(canvas, apng, options) {
         }
       }
 
+      currentTime = performance.now();
       if (play) loop();
     }
+
+    startTime = performance.now();
 
     loop();
 
@@ -229,6 +274,7 @@ APNG.Helper = function(canvas, apng, options) {
   this.stop = function() {
     me.pause();
     cFrame = 0;
+    startTime = -1;
     render();
 
     if (me.onstop)
@@ -286,6 +332,11 @@ APNG.Helper = function(canvas, apng, options) {
     return {timeStamp: Date.now(), context: ctx, target: me}
   }
 
+  function defProp(name, getter, setter) {
+    var def = {get: getter};
+    if (setter) def.set = setter;
+    Object.defineProperty(me, name, def);
+  }
   /*--------------------------------------------------------------------
 
       SETUP AND INITIALIZATIONS

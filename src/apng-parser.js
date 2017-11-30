@@ -1,7 +1,6 @@
 /*!
-	APNG Parser ver 0.3.0 alpha
-	Copyright (c) 2017 Epistemex
-	www.epistemex.com
+	APNG Parser ver 0.4.0 alpha
+	Copyright (c) 2017 Epistemex.com
 	License: CC BY-NC-SA 4.0
 */
 
@@ -40,13 +39,13 @@ APNG.Parser = function(input, callback, onerror) {
    * Width of animation in pixels
    * @type {number}
    */
-  this.width = 0;
+  this.width =
 
   /**
    * Height of animation in pixels
    * @type {number}
    */
-  this.height = 0;
+  this.height =
 
   /**
    * Number of iterations (loops) defined in animation header chunk.
@@ -112,8 +111,7 @@ APNG.Parser = function(input, callback, onerror) {
     var view = new DataView(buffer),
         pos = 0,
         frames = 0,
-        chunks = [],
-        isAPNG = false;
+        chunks = [];
 
     // validate PNG header
     if (getU32() !== 0x89504E47 || getU32() !== 0x0D0A1A0A)
@@ -132,7 +130,7 @@ APNG.Parser = function(input, callback, onerror) {
       };
       chunks.push(chunk);
 
-      if (chunk.name === "acTL") isAPNG = true;
+      if (chunk.name === "acTL") me.isAPNG = true;
       pos += chunk.size + 4;                                            // skip to next chunk skipping CRC32
     }
 
@@ -142,9 +140,7 @@ APNG.Parser = function(input, callback, onerror) {
 
     --------------------------------------------------------------------*/
 
-    if (isAPNG) {
-
-      me.isAPNG = true;                                                 // make public property
+    if (me.isAPNG) {
 
       var parts = null,                                                 // image data parts (IDAT, fdAT) for each file
           fctlBeforeIDAT = false,                                       // for IDAT chunk, if true IDAT is part of anim.

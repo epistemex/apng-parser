@@ -25,21 +25,25 @@ Features
 Usage
 -----
 
-    var apng = new APNG.Parser(url|blob|file|buffer, callback [,onerror]);
-    var rawFrame = apng.frames[n];	// raw frame n (region, no dipose/blend)
-    var info = apng.frameInfo[n];   // get information about frame n
-    
+```javascript
+var apng = new APNG.Parser(url|blob|file|buffer, callback [,onerror]);
+var rawFrame = apng.frames[n];	// raw frame n (region, no dipose/blend)
+var info = apng.frameInfo[n];   // get information about frame n
+```
+ 
 Produces an object holding each individual frame as image as well as individual
 frame and animation information.
 
-You can animate it manually, or use the included `APNG.Helper` object:
-
-    var anim = new APNG.Helper(canvas, apng, options);
-    anim.play();                    // play, stop, pause
-    anim.currentFrame = n;          // renders full frame n
-    anim.onframe = function(e) {    // various callbacks available
-      // render overlay via e.context
-    };
+You can animate it manually, or use the included `APNG.Helper` object (which can
+also be used to render out single frames based on dispose and blend operations):
+```javascript
+var anim = new APNG.Helper(canvas, apng, options);
+anim.play();                    // play, stop, pause
+anim.currentFrame = n;          // renders full frame n
+anim.onframe = function(e) {    // various callbacks available
+  // render overlay via e.context
+};
+```
 
 See included HTML documentation for details.
 

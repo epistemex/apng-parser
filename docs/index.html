@@ -113,12 +113,13 @@ each frame etc. </p>
 <li>Non-blocking and asynchronous</li>
 <li>Fast and easy to use.</li>
 </ul>
-<h2>Usage</h2><pre class="prettyprint source"><code>var apng = new APNG.Parser(url|blob|file|buffer, callback [,onerror]);
+<h2>Usage</h2><pre class="prettyprint source lang-javascript"><code>var apng = new APNG.Parser(url|blob|file|buffer, callback [,onerror]);
 var rawFrame = apng.frames[n];    // raw frame n (region, no dipose/blend)
 var info = apng.frameInfo[n];   // get information about frame n</code></pre><p>Produces an object holding each individual frame as image as well as individual
 frame and animation information.</p>
-<p>You can animate it manually, or use the included <code>APNG.Helper</code> object:</p>
-<pre class="prettyprint source"><code>var anim = new APNG.Helper(canvas, apng, options);
+<p>You can animate it manually, or use the included <code>APNG.Helper</code> object (which can
+also be used to render out single frames based on dispose and blend operations):</p>
+<pre class="prettyprint source lang-javascript"><code>var anim = new APNG.Helper(canvas, apng, options);
 anim.play();                    // play, stop, pause
 anim.currentFrame = n;          // renders full frame n
 anim.onframe = function(e) {    // various callbacks available
