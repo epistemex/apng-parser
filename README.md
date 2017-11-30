@@ -21,18 +21,6 @@ Features
 - Non-blocking and asynchronous
 - Fast and easy to use.
 
-
-Install
--------
-
-**apng-parser** can be installed in various ways:
-
-- Git using HTTPS: `git clone https://gitlab.com/epistemex/apng-parser.git`
-- Git using SSH: `git clone git@gitlab.com:epistemex/apng-parser.git`
-- Download [zip archive](https://gitlab.com/epistemex/apng-parser/repository/archive.zip?ref=master) and extract.
-- Download [tar ball](https://gitlab.com/epistemex/apng-parser/repository/archive.tar.gz?ref=master) and extract.
-
-	
 Usage
 -----
 
@@ -56,7 +44,7 @@ See included HTML documentation for details.
 Issues
 ------
 
-See the [issue tracker](https://gitlab.com/epistemex/apng-parser/issues) for details.
+See the [issue tracker](https://github.com/epistemex/apng-parser/issues) for details.
 
 
 License
