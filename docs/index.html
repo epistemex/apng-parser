@@ -93,15 +93,16 @@
     <section class="readme-section">
         <article><h1>﻿apng-parser</h1><p>Parse Animated PNG files into single frames. Does not animate the frames
 but provide them for the program so it can animate or analyze the file.</p>
-<p>The package comes with a handy helper object that can handle the animation,
-render out a single frame correctly, provide events for each frame etc. </p>
+<p>The package comes with a handy animation helper object that can handle 
+the animation, render out a single frame correctly, provide events for 
+each frame etc. </p>
 <h2>Features</h2><ul>
 <li>Parses Animated PNG (APNG) files and builds individual PNG files from each raw frame.</li>
-<li>Provide frames as raw frames</li>
+<li>Provide frames as raw frames (regions, offsets preserved).</li>
 <li>Provide frames as rendered (via the helper)</li>
 <li>Helper can render individual frames to canvas</li>
-<li>Helper can play forward, backward, ping-pong</li>
-<li>Helper can generate full-frame sprite-sheets</li>
+<li>Helper can play forward as well as non-standard backward and ping-pong</li>
+<li>Helper can generate full-frame sprite-sheets for efficient animations</li>
 <li>Non-blocking and asynchronous</li>
 <li>Fast and easy to use.</li>
 </ul>
