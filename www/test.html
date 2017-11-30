@@ -8,34 +8,37 @@
   </style>
 </head>
 <body>
+
   <h3>Original animated by browser + Canvas parsed and animated by APNGParser + APNGHelper</h3>
+
   <p>Notice they start at different times due to loading and parsing finishes at different times.
-  Also notice that the APNGHelper uses requestAnimationFrame where it can to reduce load and to
-  sync properly with monitor.</p>
+     Also notice that the APNGHelper uses requestAnimationFrame where it can to reduce load and to
+     sync properly with monitor.</p>
   <p>At the bottom is an example of a sprite-sheet produced by APNGHelper.toSpritesheet() which can be
-  used to for example make efficient animations.</p>
+     used to for example make efficient animations.</p>
 
-  <img src="gfx/testanim_optimized.png">
+  <img src="gfx/testanim.png">
 
-  <canvas id=c></canvas>
+  <canvas id="canvas"></canvas>
 
 <script src="../src/apng-parser.js"></script>
 <script src="../src/apng-helper.js"></script>
 <script>
 
-  var anim, apng = new APNGParser("gfx/testanim_optimized.png", function() {
+  // Load a (A)PNG file, parse, animate and produce a sprite-sheet while at it
+  var anim, apng = new APNG.Parser("gfx/testanim.png", function() {
 
     // inspect object in console (F12)
     console.log(this);
 
     // Create an animation helper and play
-    anim = new APNGHelper(c, apng, {ignoreIterations: true});
+    anim = new APNG.Helper(canvas, apng, {ignoreIterations: true});
     anim.play();
 
     // Generate a sprite-sheet for demo - this can be used instead of
     // animation helper and could be more efficient as each frame is
     // pre-rendered.
-    document.body.appendChild(APNGHelper.toSpritesheet(apng, {
+    document.body.appendChild(APNG.Helper.toSpritesheet(apng, {
       drawCallback: frameNumberOverlay, // for demo only
       maxWidth: 4600
     }));
@@ -49,6 +52,7 @@
     e.context.font = "20px sans-serif";
     e.context.fillText(i++, 10, 20);
   }
+
 </script>
 </body>
 </html>

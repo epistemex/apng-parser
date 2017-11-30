@@ -25,14 +25,14 @@ Features
 Usage
 -----
 
-    var apng = new APNGParser(url|blob|file|buffer, callback [,onerror]);
+    var apng = new APNG.Parser(url|blob|file|buffer, callback [,onerror]);
 
 Produces an object holding each individual frame as image as well as individual
 frame and animation information.
 
 You can animate it manually, or use the included `APNGHelper` object:
 
-    var anim = new APNGHelper(canvas, apng, options);
+    var anim = new APNG.Helper(canvas, apng, options);
     anim.play();                    // play, stop, pause
     anim.gotoFrame(n);              // renders a full frame correctly
     anim.onframe = function(e) {    // various callbacks available

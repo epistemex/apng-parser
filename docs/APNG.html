@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>apng-parser Index</title>
+	<title>apng-parser Namespace: APNG</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -77,61 +77,100 @@
 		<div id="main">
 			
 
+	<h1 class="page-title">Namespace: APNG</h1>
+<section>
+
+<header>
+    
+        <h2>
+        APNG
+        </h2>
+        
+    
+</header>
+
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>APNG holds objects to parse, animate and [build] animated PNG files.</p></div>
+        
+
+        
+<dl class="details">
+    
+
 	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
 	
 
 
 
-
-
-
-
-
-
-
-
-	
 	
 
+	
+
+	
+
+	
+</dl>
 
 
+        
+    
+    </div>
 
+    
 
-    <section class="readme-section">
-        <article><h1>﻿apng-parser</h1><p>Parse Animated PNG files into single frames. Does not animate the frames
-but provide them for the program so it can animate or analyze the file.</p>
-<p>The package comes with a handy animation helper object that can handle 
-the animation, render out a single frame correctly, provide events for 
-each frame etc. </p>
-<h2>Features</h2><ul>
-<li>Parses Animated PNG (APNG) files and builds individual PNG files from each raw frame.</li>
-<li>Provide frames as raw frames (regions, offsets preserved).</li>
-<li>Provide frames as rendered (via the helper)</li>
-<li>Helper can render individual frames to canvas</li>
-<li>Helper can play <em>forward</em> as well as non-standard <em>backward</em> and <em>ping-pong</em></li>
-<li>Helper can generate full-frame sprite-sheets for efficient animations and debugging</li>
-<li>Non-blocking and asynchronous</li>
-<li>Fast and easy to use.</li>
-</ul>
-<h2>Usage</h2><pre class="prettyprint source"><code>var apng = new APNG.Parser(url|blob|file|buffer, callback [,onerror]);</code></pre><p>Produces an object holding each individual frame as image as well as individual
-frame and animation information.</p>
-<p>You can animate it manually, or use the included <code>APNGHelper</code> object:</p>
-<pre class="prettyprint source"><code>var anim = new APNG.Helper(canvas, apng, options);
-anim.play();                    // play, stop, pause
-anim.gotoFrame(n);              // renders a full frame correctly
-anim.onframe = function(e) {    // various callbacks available
-  // render overlay via e.context
-};</code></pre><p>See included HTML documentation for details.</p>
-<h2>Issues</h2><p>See the <a href="https://github.com/epistemex/apng-parser/issues">issue tracker</a> for details.</p>
-<h2>License</h2><p><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">Attribution-NonCommercial-ShareAlike 4.0 International</a></p>
-<p><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" alt="License"></a></p>
-<p><a href="mailto:github@epistemex.com">Contact us</a> if you need a commercial license.</p>
-<p><em>&copy; Epistemex 2017</em></p>
-<p><img src="http://i.imgur.com/GP6Q3v8.png" alt="Epistemex"></p></article>
-    </section>
+    
 
+    
+        <h3 class="subsection-title">Classes</h3>
 
+        <dl>
+            <dt><a href="APNG.Helper.html">Helper</a></dt>
+            <dd></dd>
+        
+            <dt><a href="APNG.Parser.html">Parser</a></dt>
+            <dd></dd>
+        </dl>
+    
 
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

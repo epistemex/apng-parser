@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>apng-parser Global</title>
+	<title>apng-parser Namespaces</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -31,23 +31,23 @@
 		<ul class="nav navbar-nav">
 			
 			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="APNG.html">APNG</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="APNGHelper.html">APNGHelper</a></li><li><a href="APNGParser.html">APNGParser</a></li>
+					<li><a href="APNG.Helper.html">APNG.Helper</a></li><li><a href="APNG.Parser.html">APNG.Parser</a></li>
 				</ul>
 			</li>
 			
 			<li class="dropdown">
 				<a href="events.list.html" class="dropdown-toggle" data-toggle="dropdown">Events<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="APNGHelper.html#event:event">APNGHelper#event:event</a></li>
-				</ul>
-			</li>
-			
-			<li class="dropdown">
-				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
-					<li><a href="global.html#commit">commit</a></li>
+					<li><a href="APNG.Helper.html#event:event">APNG.Helper#event:event</a></li>
 				</ul>
 			</li>
 			
@@ -77,7 +77,7 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Global</h1>
+	<h1 class="page-title">Namespaces</h1>
 <section>
 
 <header>
@@ -144,47 +144,169 @@
     
 
     
+        <h3 class="subsection-title">Classes</h3>
 
+        <dl>
+            <dt><a href="APNG.Helper.html">Helper</a></dt>
+            <dd></dd>
+        
+            <dt><a href="APNG.Parser.html">Parser</a></dt>
+            <dd></dd>
+        </dl>
     
 
     
 
     
-        <h3 class="subsection-title">Members</h3>
+        <h3 class="subsection-title">Namespaces</h3>
+
+        <dl>
+            <dt><a href="namespaces.html#APNG"><a href="APNG.html">APNG</a></a></dt>
+            <dd></dd>
+        </dl>
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Events</h3>
 
         <dl>
             
 <hr>
-<dt class="name" id="commit">
-    <h4><span class="type-signature"></span>commit<span class="type-signature"> :boolean</span></h4>
-
+<dt>
+    <h4 class="name" id="event:event">event</h4>
+    
     
 </dt>
 <dd>
+
     
     <div class="description">
-        <p>This property can be set to false when for example the canvas is not
-visible. The animation will still loop in the background but nothing
-is actually drawn to the canvas itself.</p>
-<p>Note: This also blocks calls to onframe callbacks.</p>
+        <p>Event object.</p>
     </div>
     
 
     
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">boolean</span>
+
+    
+        <h5>Type: 
+<span class="param-type">object</span>
 
 
+</h5>
+    
 
-            </li>
-        </ul>
+    
     
 
     
 <dl class="details">
+    
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    <dl>
+
+<table class="props table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>timeStamp</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>time stamp in ms. for when this event was created</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>context</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">CanvasRenderingContext2D</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>rendering context used for this instance</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>target</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>reference to instance of helper invoking the event</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</dl>
+
     
 
 	
@@ -224,15 +346,21 @@ is actually drawn to the canvas itself.</p>
 
 
     
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 </dd>
 
         </dl>
-    
-
-    
-
-    
-
     
 </article>
 

@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>apng-parser Class: APNGParser</title>
+	<title>apng-parser Class: Parser</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -31,16 +31,23 @@
 		<ul class="nav navbar-nav">
 			
 			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="APNG.html">APNG</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="APNGHelper.html">APNGHelper</a></li><li><a href="APNGParser.html">APNGParser</a></li>
+					<li><a href="APNG.Helper.html">APNG.Helper</a></li><li><a href="APNG.Parser.html">APNG.Parser</a></li>
 				</ul>
 			</li>
 			
 			<li class="dropdown">
 				<a href="events.list.html" class="dropdown-toggle" data-toggle="dropdown">Events<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="APNGHelper.html#event:event">APNGHelper#event:event</a></li>
+					<li><a href="APNG.Helper.html#event:event">APNG.Helper#event:event</a></li>
 				</ul>
 			</li>
 			
@@ -70,13 +77,15 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: APNGParser</h1>
+	<h1 class="page-title">Class: Parser</h1>
 <section>
 
 <header>
     
         <h2>
-        APNGParser
+            <span class="ancestors"><a href="APNG.html">APNG</a>.</span>
+        
+        Parser
         </h2>
         
     
@@ -89,7 +98,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="APNGParser"><span class="type-signature"></span>new APNGParser(input, callback [, onerror])</h4>
+    <h4 class="name" id="Parser"><span class="type-signature"></span>new Parser(input, callback [, onerror])</h4>
     
     
 </dt>
@@ -147,6 +156,9 @@ for errors is optional.</p>
 <span class="param-type">ArrayBuffer</span>
 |
 
+<span class="param-type">TypedArray</span>
+|
+
 <span class="param-type">String</span>
 |
 
@@ -172,7 +184,7 @@ for errors is optional.</p>
 
             
 
-            <td class="description last"><p>URL to a APNG file, or a Blob/File object, or a pre-filled ArrayBuffer holding a APNG file.</p></td>
+            <td class="description last"><p>URL to a APNG file, or a pre-filled Blob/File object, or a ArrayBuffer/TypedArray holding a APNG file.</p></td>
         </tr>
 
     

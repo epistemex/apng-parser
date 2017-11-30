@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>apng-parser Class: APNGHelper</title>
+	<title>apng-parser Class: Helper</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -31,16 +31,23 @@
 		<ul class="nav navbar-nav">
 			
 			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="APNG.html">APNG</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="APNGHelper.html">APNGHelper</a></li><li><a href="APNGParser.html">APNGParser</a></li>
+					<li><a href="APNG.Helper.html">APNG.Helper</a></li><li><a href="APNG.Parser.html">APNG.Parser</a></li>
 				</ul>
 			</li>
 			
 			<li class="dropdown">
 				<a href="events.list.html" class="dropdown-toggle" data-toggle="dropdown">Events<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="APNGHelper.html#event:event">APNGHelper#event:event</a></li>
+					<li><a href="APNG.Helper.html#event:event">APNG.Helper#event:event</a></li>
 				</ul>
 			</li>
 			
@@ -70,13 +77,15 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: APNGHelper</h1>
+	<h1 class="page-title">Class: Helper</h1>
 <section>
 
 <header>
     
         <h2>
-        APNGHelper
+            <span class="ancestors"><a href="APNG.html">APNG</a>.</span>
+        
+        Helper
         </h2>
         
     
@@ -89,7 +98,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="APNGHelper"><span class="type-signature"></span>new APNGHelper(canvas, apng [, options])</h4>
+    <h4 class="name" id="Helper"><span class="type-signature"></span>new Helper(canvas, apng [, options])</h4>
     
     
 </dt>
@@ -175,7 +184,7 @@ overridden via option to force use of this method for all frames.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="APNGParser.html">APNGParser</a></span>
+<span class="param-type"><a href="APNG.Parser.html">APNG.Parser</a></span>
 
 
 
@@ -654,7 +663,14 @@ is actually drawn to the canvas itself.</p>
 <dd>
     
     <div class="description">
-        <p>Gets the current frame. To set current frame use <code>gotoFrame()</code>.</p>
+        <p>Gets the current frame number.</p>
+<p>Notes setting a frame:</p>
+<p>Renders the sequence based on region, dispose and blending for each
+frame until requested frame is reached. This will produce a correct
+looking complete frame.</p>
+<p>If you only want the raw frame use the APNGParser object directly
+with the property <code>frame[frameIndex]</code> instead.</p>
+<p>The complete frame is rendered to the canvas.</p>
     </div>
     
 
@@ -664,77 +680,6 @@ is actually drawn to the canvas itself.</p>
             <li>
                 
 <span class="param-type">Number</span>
-
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id="mode">
-    <h4><span class="type-signature"></span>mode<span class="type-signature"> :String</span></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>Set or get current playback mode.</p>
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">String</span>
 
 
 
@@ -1252,7 +1197,7 @@ your context changes (transformations, composition, clipping etc.).</p>
 
     
     <div class="description">
-        <p>Produces a horizontal sprite-sheet from a APNGParser object.
+        <p>Produces a horizontal sprite-sheet from a APNG.Parser object.
 Each cell is the same size as the entire frame. This can be used as
 an efficient replacement for the APNGHelper as each frame is complete.</p>
     </div>
@@ -1297,7 +1242,7 @@ an efficient replacement for the APNGHelper as each frame is complete.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="APNGParser.html">APNGParser</a></span>
+<span class="param-type"><a href="APNG.Parser.html">APNG.Parser</a></span>
 
 
 
@@ -1316,7 +1261,7 @@ an efficient replacement for the APNGHelper as each frame is complete.</p>
 
             
 
-            <td class="description last"><p>APNGParser object.</p></td>
+            <td class="description last"><p>APNG.Parser object.</p></td>
         </tr>
 
     
@@ -1539,139 +1484,6 @@ an efficient replacement for the APNGHelper as each frame is complete.</p>
 
 
         
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="gotoFrame"><span class="type-signature"></span>gotoFrame(frame)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Renders the sequence based on region, dispose and blending for each
-frame until requested frame is reached. This will produce a correct
-looking complete frame.</p>
-<p>If you only want the raw frame use the APNGParser object directly
-with the property <code>frame[frameIndex]</code> instead.</p>
-<p>The complete frame is rendered to the canvas.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>frame</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>frame number to render.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
 
     
 </dd>

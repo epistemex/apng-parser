@@ -1,6 +1,11 @@
 Change log for apng-parser
 --------------------------
 
+0.3.0
+CHG: APNGParser, APNGHelper objects moved to new namespace as Parser and Helper
+REM: [helper] gotoFrame() is removed
+CHG: gotoFrame() is replaced by setter for property currentFrame instead
+
 0.2.0
 ADD: isAPNG public property to check if source is actually a animated PNG.
 CHG: internal refactoring.

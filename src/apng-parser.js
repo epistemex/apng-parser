@@ -1,11 +1,17 @@
 /*!
-	APNG Parser ver 0.2.0 alpha
+	APNG Parser ver 0.3.0 alpha
 	Copyright (c) 2017 Epistemex
 	www.epistemex.com
 	License: CC BY-NC-SA 4.0
 */
 
 "use strict";
+
+/**
+ * APNG holds objects to parse, animate and [build] animated PNG files.
+ * @namespace APNG
+ */
+var APNG = APNG || {};
 
 /**
  * Parses a Animated PNG (APNG) into raw frames (images) which can be
@@ -15,12 +21,12 @@
  * The parsing is asynchronous and require a callback function. Callback
  * for errors is optional.
  *
- * @param {ArrayBuffer|String|Blob|File} input - URL to a APNG file, or a Blob/File object, or a pre-filled ArrayBuffer holding a APNG file.
+ * @param {ArrayBuffer|TypedArray|String|Blob|File} input - URL to a APNG file, or a pre-filled Blob/File object, or a ArrayBuffer/TypedArray holding a APNG file.
  * @param {Function} callback - callback function invoked when all parsing and conversion is done. `this` represents the current instance.
  * @param {Function} [onerror] - error callback.
  * @constructor
  */
-function APNGParser(input, callback, onerror) {
+APNG.Parser = function(input, callback, onerror) {
 
   var me = this,
       table,
@@ -93,7 +99,7 @@ function APNGParser(input, callback, onerror) {
   else if (input instanceof ArrayBuffer) {
     parseBuffer(input);
   }
-  else throw "Wrong input type";
+  else throw "Unknown input type";
 
   /*--------------------------------------------------------------------
 
@@ -383,4 +389,4 @@ function APNGParser(input, callback, onerror) {
 
     return chunk
   }
-}
+};
