@@ -1,5 +1,5 @@
 /*!
-	APNG Parser ver 0.5.0 alpha
+	APNG Parser ver 0.6.0 alpha
 	Copyright (c) 2017 Epistemex.com
 	License: CC BY-NC-SA 4.0
 */
@@ -82,11 +82,11 @@ APNG.Parser = function(input, callback, onerror) {
    */
   this.isAPNG = false;
 
-  /*--------------------------------------------------------------------
+  /*-----------------------------------------------------------------------------------------------------------------*\
 
       VERIFY AND CONVERT (IF NEEDED) INPUT TYPE
 
-  --------------------------------------------------------------------*/
+  \*-----------------------------------------------------------------------------------------------------------------*/
 
   if (input instanceof Blob || input instanceof File) {
     fileReader = new FileReader();
@@ -106,11 +106,11 @@ APNG.Parser = function(input, callback, onerror) {
   }
   else throw "Unknown input type";
 
-  /*--------------------------------------------------------------------
+  /*-----------------------------------------------------------------------------------------------------------------*\
 
       PARSER
 
-  --------------------------------------------------------------------*/
+  \*-----------------------------------------------------------------------------------------------------------------*/
 
   function parseBuffer(buffer) {
 
@@ -140,15 +140,17 @@ APNG.Parser = function(input, callback, onerror) {
       pos += chunk.size + 4;                                            // skip to next chunk skipping CRC32
     }
 
-    /*--------------------------------------------------------------------
+    /*---------------------------------------------------------------------------------------------------------------*\
 
         IF APNG, PARSE CHUNKS AND DATA
 
-    --------------------------------------------------------------------*/
+    \*---------------------------------------------------------------------------------------------------------------*/
 
     if (me.isAPNG) {
 
       var parts = null,                                                 // image data parts (IDAT, fdAT) for each file
+          fcCount = 0,                                                  // check fcTL chunk count, compare with frames
+          seqLast = 0, seqNo, errOutOfOrder = false,                    // detect out-of-order APNGs
           fctlBeforeIDAT = false,                                       // for IDAT chunk, if true IDAT is part of anim.
           duration = 0,                                                 // track total duration
           files = [],                                                   // data separated for each PNG file
@@ -174,10 +176,16 @@ APNG.Parser = function(input, callback, onerror) {
 
         // Frame control chunk hold offset, region size and timing data
         else if (chunk.name === "fcTL") {
+          fcCount++;
           if (parts) files.push(parts);                                 // push previous parts if any
           parts = [];                                                   // initialize for new parts
           fctlBeforeIDAT = true;
-          pos = chunk.pos + 4;                                          // skip sequence no.
+          pos = chunk.pos;                                              // skip sequence no.
+
+          seqNo = getU32();
+          if (seqNo >= seqLast) seqLast = seqNo;
+          else errOutOfOrder = true;
+
           me.frameInfo.push({
             width  : getU32(),
             height : getU32(),
@@ -205,25 +213,31 @@ APNG.Parser = function(input, callback, onerror) {
 
         // Image data for frame, holds sequence number (ignored) followed by regular IDAT image data
         else if (chunk.name === "fdAT") {
+          seqNo = view.getUint32(chunk.pos);
+          if (seqNo >= seqLast) seqLast = seqNo;
+          else errOutOfOrder = true;
           parts.push(new Uint8Array(view.buffer, chunk.pos + 4, chunk.size - 4));
         }
       });
 
-      // publish duration
-      me.duration = duration;
-
       // add final part
       if (parts) files.push(parts);
 
-      // if first frame's dispose method is 2 then use 1, as per specs
-      if (me.frameInfo[0].dispose === 2)
-        me.frameInfo[0].dispose = 1;
+      // publish duration
+      me.duration = duration;
 
-      /*--------------------------------------------------------------------
+      // if first frame's dispose method is 2 then use 1, as per specs
+      //if (me.frameInfo[0].dispose === 2); // DISCUSS as the goal is not so much to validate APNGs but parsing
+      //  me.frameInfo[0].dispose = 1;      // them as-is, we should assume this is correct from producer (?).
+
+      if (fcCount !== frames || errOutOfOrder) // todo: improve all error handling (target: beta)
+        console.log("Warning: APNG has sequence out of order or mismatching frame count.");
+
+      /*-------------------------------------------------------------------------------------------------------------*\
 
           BUILD BLOBS REPRESENTING EACH FRAME AS A (PRODUCED) PNG FILE
 
-      --------------------------------------------------------------------*/
+      \*-------------------------------------------------------------------------------------------------------------*/
 
       // create a CRC32 LUT
       table = buildCRC();
@@ -269,11 +283,11 @@ APNG.Parser = function(input, callback, onerror) {
         // push final IEND chunk
         list.push(new Uint32Array([0, 0x444e4549, 0x826042ae]));
 
-        /*--------------------------------------------------------------------
+        /*-----------------------------------------------------------------------------------------------------------*\
 
             CREATE IMAGE OBJECTS FOR EACH FRAME BLOB
 
-        --------------------------------------------------------------------*/
+        \*-----------------------------------------------------------------------------------------------------------*/
 
         blob = new Blob(list, mimeType);                                // merge part list into a single blob
         list = null;                                                    // lets hope GC can kick in due to async loading below
@@ -303,11 +317,11 @@ APNG.Parser = function(input, callback, onerror) {
     }
     else {
 
-      /*--------------------------------------------------------------------
+      /*-----------------------------------------------------------------------------------------------------------*\
 
           IT'S A REGULAR PNG, STORE IT AS A SINGLE FRAME
 
-      --------------------------------------------------------------------*/
+      \*-----------------------------------------------------------------------------------------------------------*/
 
       me.frames.push(new Image);
       me.frames[0].onload = function() {
@@ -326,11 +340,11 @@ APNG.Parser = function(input, callback, onerror) {
       me.frames[0].src = URL.createObjectURL(new Blob([buffer], mimeType))
     }
 
-    /*--------------------------------------------------------------------
+    /*-----------------------------------------------------------------------------------------------------------*\
 
         DATAVIEW HELPERS
 
-    --------------------------------------------------------------------*/
+    \*-----------------------------------------------------------------------------------------------------------*/
 
     function getU8() {
       return view.getUint8(pos++);
@@ -350,7 +364,7 @@ APNG.Parser = function(input, callback, onerror) {
 
     function getFourCC() {
       var v = getU32(), c = String.fromCharCode;
-      return	c(v >>> 24) + c(v >> 16 & 0xff) + c(v >> 8 & 0xff) + c(v & 0xff);
+      return c(v >>> 24) + c(v >> 16 & 0xff) + c(v >> 8 & 0xff) + c(v & 0xff);
     }
   }
 

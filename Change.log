@@ -1,6 +1,14 @@
 Change log for apng-parser
 --------------------------
 
+0.6.0
+ADD: [helper] new property to set a new canvas target
+ADD: [helper] debug mode and properties
+ADD: [helper] property playing
+ADD: [helper] static method retime()
+ADD: [helper] static method setDuration()
+ADD: [helper] static method setDelay()
+
 0.5.0
 ADD: [parser] duration of animation in ms.
 CHG: [helper] duration property wraps Parser property (for convenience).

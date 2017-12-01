@@ -1,12 +1,15 @@
 ﻿apng-parser
 ===========
 
-Parse Animated PNG files into single frames. Does not animate the frames
-but provide them for the program so it can animate or analyze the file.
+Parse Animated PNG files into single frames that can be used for 
+animation and analyzis.
 
 The package comes with a handy animation helper object that can handle 
 the animation, render out a single frame correctly, provide events for 
-each frame etc. 
+each frame, adjust timings and perform visual debugging. 
+
+**NOTE: Currently in *alpha* - API is subject to change with no prior notice.
+Use for testing only.**
 
 
 Features
@@ -16,10 +19,13 @@ Features
 - Provide frames as raw frames (regions, offsets preserved).
 - Provide frames as rendered (via the helper)
 - Helper can render individual frames to canvas
+- Helper can retime, change duration and frame delay
 - Helper can play *forward* as well as non-standard *backward* and *ping-pong*
+- Helper can render debug information to each frame
 - Helper can generate full-frame sprite-sheets for efficient animations and debugging
 - Non-blocking and asynchronous
-- Fast and easy to use.
+- Fast and easy to use
+- Runs in all evergreen browsers
 
 
 Usage
@@ -43,6 +49,7 @@ anim.currentFrame = n;              // renders full frame n
 anim.onframe = function(e) {        // various callbacks available
   // here you can render overlays via e.context
 };
+anim.debug = true;                  // render debug information onto the frames
 ```
 
 See included HTML documentation for details.

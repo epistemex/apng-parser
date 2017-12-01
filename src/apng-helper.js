@@ -1,5 +1,6 @@
 /*
-	APNG Animation Helper ver 0.5.0 alpha
+	APNG Animation Helper
+
 	Copyright (c) 2017 Epistemex
 	License: CC BY-NC-SA 4.0
 */
@@ -22,6 +23,11 @@ APNG = APNG || {};
  * @param {Boolean} [options.ignoreIterations=true] - will loop indefinitely if true (default), otherwise number of iterations is considered.
  * @param {Boolean} [options.forceRequestAnimationFrame=false] - override timing and force use of `requestAnimationFrame()` for all frames.
  * @param {String} [options.mode="forward"] - playback mode: forward, backward, ping-pong. NOTE: These modes are not part of the Animation PNG standard.
+ *  They may also not be compatible will a APNG files depending on their region and dispose/blend modes.
+ * @param {Boolean} [options.debug=false] - if true will draw current region rectangle, frame number, dispose and blend modes on each frame
+ * @param {string} [options.debugColorText="#fff"] - set color for debug text when debug=true
+ * @param {string} [options.debugColorRegion="#f0f"] - set color for debug rectangle when debug=true
+ * @param {string} [options.debugTextPosition={x: 5, y: 12}] - set text position if debug=true
  * @constructor
  */
 APNG.Helper = function(canvas, apng, options) {
@@ -30,10 +36,17 @@ APNG.Helper = function(canvas, apng, options) {
     iterations                : -1,
     ignoreIterations          : true,
     forceRequestAnimationFrame: false,
-    mode                      : "forward"
+    mode                      : "forward",
+    debug                     : false,
+    debugColorRegion          : "#f0f",
+    debugColorText            : "#fff",
+    debugTextPosition         : {x: 5, y: 12}
   }, options);
 
   var me = this,
+      temp = document.createElement("canvas"),
+      ctxt = temp.getContext("2d"),
+      ctx = canvas.getContext("2d"),
       startTime = -1,
       currentTime = 0,
       frames,
@@ -42,12 +55,8 @@ APNG.Helper = function(canvas, apng, options) {
       loops = 0,
       iterations,
       clrBg = false,
-      temp = document.createElement("canvas"),
-      ctxt = temp.getContext("2d"),
-      ctx = canvas.getContext("2d"),
-      ref,
       commit = true,
-      play = false;
+      timeRef;
 
   /**
    * The 2D context used for the canvas internally.
@@ -55,6 +64,12 @@ APNG.Helper = function(canvas, apng, options) {
    * @fires APNG.Helper#event
    */
   this.context = ctx;
+
+  /**
+   * True if animation is playing.
+   * @type {boolean}
+   */
+  this.playing = false;
 
   /**
    * Optional callback for when an animation starts to play.
@@ -178,7 +193,7 @@ APNG.Helper = function(canvas, apng, options) {
    * @member {Number} APNG.Helper#currentTime
    */
   defProp("currentTime",
-    function() {return play ? performance.now() - startTime : currentTime - startTime},
+    function() {return me.playing ? performance.now() - startTime : currentTime - startTime},
     function(time) {
       var i = 0, delta = 0;
       while(i < frameInfo.length) {
@@ -220,13 +235,66 @@ APNG.Helper = function(canvas, apng, options) {
   );
 
   /**
+   * Enable or disable debugging.
+   * @member {boolean} APNG.Helper#debug
+   */
+  defProp("debug",
+    function() {return options.debug},
+    function(state) {options.debug = !!state}
+  );
+
+  /**
+   * Set color of text if debugging is enabled.
+   * @member {boolean} APNG.Helper#debugColorText
+   */
+  defProp("debugColorText",
+    function() {return ctx.fillStyle},
+    function(color) {ctx.fillStyle = color}
+  );
+
+  /**
+   * Set color of region rectangle if debugging is enabled.
+   * @member {boolean} APNG.Helper#debugColorRegion
+   */
+  defProp("debugColorRegion",
+    function() {return ctx.strokeStyle},
+    function(color) {ctx.strokeStyle = color}
+  );
+
+  /**
+   * Set text position of frame information if debugging is enabled.
+   * The argument is an object with properties for x and y.
+   * @member {*} APNG.Helper#debugTextPosition
+   */
+  defProp("debugTextPosition",
+    function() {return options.debugTextPosition},
+    function(pos) {options.debugTextPosition = pos}
+  );
+
+  /**
+   * Set a new canvas as target for frame rendering. The canvas will be
+   * reset and resized to match the APNG.
+   * @member {boolean} APNG.Helper#canvas
+   */
+  defProp("canvas",
+    function() {return canvas},
+    function(newCanvas) {
+      canvas = newCanvas;
+      me.context = ctx = canvas.getContext("2d");
+      if (!ctx) throw "This canvas cannot be used for 2D.";
+      canvas.width = apng.width;
+      canvas.height = apng.height;
+    }
+  );
+
+  /**
    * Start playing animation from current frame. If iterations is
    * considered it will automatically stop after last iteration (loop)
    * has been played.
    */
   this.play = function() {
 
-    play = true;
+    me.playing = true;
 
     function loop() {
       var info = frameInfo[cFrame];
@@ -234,7 +302,7 @@ APNG.Helper = function(canvas, apng, options) {
         render();
         if (me.onframe) me.onframe(getEvent());
       }
-      ref = (info.delay >= 16 && info.delay <= 17) || options.forceRequestAnimationFrame ?
+      timeRef = (info.delay >= 16 && info.delay <= 17) || options.forceRequestAnimationFrame ?
             requestAnimationFrame(advance) : setTimeout(advance, info.delay);
     }
 
@@ -246,13 +314,13 @@ APNG.Helper = function(canvas, apng, options) {
         loops++;
         if (me.oniteration) me.oniteration(getEvent());
         if (loops >= iterations && !options.ignoreIterations) {
-          play = false;
+          me.playing = false;
           if (me.onended) me.onended(getEvent());
         }
       }
 
       currentTime = performance.now();
-      if (play) loop();
+      if (me.playing) loop();
     }
 
     startTime = performance.now();
@@ -281,10 +349,10 @@ APNG.Helper = function(canvas, apng, options) {
    */
   this.pause = function() {
 
-    play = false;
+    me.playing = false;
 
-    clearTimeout(ref);
-    cancelAnimationFrame(ref);
+    clearTimeout(timeRef);
+    cancelAnimationFrame(timeRef);
 
     if (me.onpause)
       me.onpause(getEvent());
@@ -307,20 +375,26 @@ APNG.Helper = function(canvas, apng, options) {
 
     // check dispose function
     if (info.dispose === 1) {
-      ctx.clearRect(info.x, info.y, info.width, info.height)
+      ctx.clearRect(info.x|0, info.y|0, info.width|0, info.height|0)
     }
     else if (info.dispose === 2) {
-      ctxt.clearRect(0, 0, temp.width, temp.height);
-      ctxt.drawImage(canvas, info.x, info.y, info.width, info.height, info.x, info.y, info.width, info.height);
+      ctxt.clearRect(0, 0, temp.width|0, temp.height|0);
+      ctxt.drawImage(canvas, info.x|0, info.y|0, info.width|0, info.height|0, info.x|0, info.y|0, info.width|0, info.height|0);
       clrBg = true;
     }
 
     // check blend op.
     if (info.blend === 0)
-      ctx.clearRect(info.x, info.y, info.width, info.height);
+      ctx.clearRect(info.x|0, info.y|0, info.width|0, info.height|0);
 
     // render frame
-    ctx.drawImage(frame, info.x, info.y);
+    ctx.drawImage(frame, info.x|0, info.y|0);
+
+    // debug info?
+    if (options.debug) {
+      ctx.strokeRect((info.x|0)+0.5, (info.y|0)+0.5, (info.width-1)|0, (info.height-1)|0);
+      ctx.fillText("F:" + cFrame + "  D:" + info.dispose +  "  B:" + info.blend, options.debugTextPosition.x, options.debugTextPosition.y);
+    }
   }
 
   function getEvent() {
@@ -352,6 +426,12 @@ APNG.Helper = function(canvas, apng, options) {
     options.ignoreIterations = !!(iterations = 0);                      // don't ignore iterations, but use 0 so we only render one frame and stop
   }
 
+  // Init debug colors
+  if (options.debug) {
+    ctx.fillStyle = options.debugColorText;
+    ctx.strokeStyle = options.debugColorRegion;
+  }
+
   // Init playback mode (!)
   me.mode = options.mode;                                               // this call also sets up frames/info arrays
 };
@@ -372,7 +452,7 @@ APNG.Helper = function(canvas, apng, options) {
 APNG.Helper.toSpritesheet = function(apng, options) {
 
   options = Object.assign({
-    maxWidth: 8000,
+    maxWidth    : 6000,
     drawCallback: null
   }, options);
 
@@ -388,7 +468,7 @@ APNG.Helper.toSpritesheet = function(apng, options) {
   if (apng.width * apng.frames.length > options.maxWidth) {             // too many cells to fit horizontally?
     cnt = Math.floor(options.maxWidth / apng.width);                    // get number of cells horizontally
     c2.width = cnt * apng.width;                                        // get an actual width based on count
-    c2.height = Math.ceil((apng.width * apng.frames.length) / options.maxWidth) * apng.height; // get actual height
+    c2.height = Math.ceil((apng.width * (apng.frames.length-1)) / options.maxWidth) * apng.height; // get actual height
   }
   else {
     c2.width = apng.width * apng.frames.length;                         // single row, size of sprite-sheet
@@ -409,6 +489,53 @@ APNG.Helper.toSpritesheet = function(apng, options) {
   return ctx.canvas
 };
 
+/**
+ * Utility method that can re-time the animation.
+ * @param {APNG.Parser} apng - a parser object to re-time
+ * @param {Number} timeScale - a normalized scale value (1 = 100%, 0.5 = 50%, 2 = 200% etc.)
+ * @static
+ */
+APNG.Helper.retime = function(apng, timeScale) {
+  this._fn(function(info) {info.delay *= timeScale});
+};
+
+/**
+ * Utility method to scale the total duration. Time is given in milliseconds.
+ * Each frame in the animation is scaled with the same scale factor internally.
+ *
+ * Note: the duration must be considered an approximation of duration.
+ *
+ * @param {APNG.Parser} apng - a parser object to re-time
+ * @param {Number} duration - new duration in milliseconds
+ * @static
+ */
+APNG.Helper.setDuration = function(apng, duration) {
+  var timeScale = duration / apng.duration;
+  this._fn(function(info) {info.delay *= timeScale});
+};
+
+/**
+ * Utility method to set new delay for each frame. Overrides all existing
+ * delays.
+ *
+ * @param {APNG.Parser} apng - a parser object to re-time
+ * @param {Number} delay - new frame delay in milliseconds
+ * @static
+ */
+APNG.Helper.setDelay = function(apng, delay) {
+  this._fn(function(info) {info.delay = delay});
+};
+
+/**
+ * Common function handler to update duration properly.
+ * @param {Function} fn - calculation function with internal references. The function is given an frameInfo object
+ * @private
+ */
+APNG.Helper._fn = function(fn) {
+  var fi = apng.frameInfo;
+  fi.forEach(fn);
+  apng.duration = fi.reduce(function(prev, curr) {return prev + curr.delay}, 0);
+};
 
 /**
  * Event object.

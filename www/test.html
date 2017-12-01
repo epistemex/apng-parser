@@ -32,7 +32,7 @@
     console.log(this);
 
     // Create an animation helper and play
-    anim = new APNG.Helper(canvas, apng, {ignoreIterations: true});
+    anim = new APNG.Helper(canvas, apng, {ignoreIterations: true, debug: false});
     anim.play();
 
     // Generate a sprite-sheet for demo - this can be used instead of
@@ -40,7 +40,7 @@
     // pre-rendered.
     document.body.appendChild(APNG.Helper.toSpritesheet(apng, {
       drawCallback: frameNumberOverlay, // for demo only
-      maxWidth: 4600
+      maxWidth: 4592
     }));
   });
 
