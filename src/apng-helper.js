@@ -468,7 +468,7 @@ APNG.Helper.toSpritesheet = function(apng, options) {
   if (apng.width * apng.frames.length > options.maxWidth) {             // too many cells to fit horizontally?
     cnt = Math.floor(options.maxWidth / apng.width);                    // get number of cells horizontally
     c2.width = cnt * apng.width;                                        // get an actual width based on count
-    c2.height = Math.ceil((apng.width * (apng.frames.length-1)) / options.maxWidth) * apng.height; // get actual height
+    c2.height = Math.ceil((apng.width * (apng.frames.length)) / options.maxWidth) * apng.height; // get actual height
   }
   else {
     c2.width = apng.width * apng.frames.length;                         // single row, size of sprite-sheet
@@ -480,7 +480,7 @@ APNG.Helper.toSpritesheet = function(apng, options) {
     anim.currentFrame = i;
     ctx.drawImage(c1, x, y);
     x += apng.width;
-    if (x > options.maxWidth) {
+    if (x >= options.maxWidth) {
       x = 0;
       y += apng.height;
     }
