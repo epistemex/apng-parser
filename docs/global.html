@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>apng-parser Namespaces</title>
+	<title>apng-parser Global</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -84,7 +84,7 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Namespaces</h1>
+	<h1 class="page-title">Global</h1>
 <section>
 
 <header>
@@ -151,58 +151,25 @@
     
 
     
-        <h3 class="subsection-title">Classes</h3>
-
-        <dl>
-            <dt><a href="APNG.Helper.html">Helper</a></dt>
-            <dd></dd>
-        
-            <dt><a href="APNG.Parser.html">Parser</a></dt>
-            <dd></dd>
-        </dl>
-    
-
-    
-
-    
-        <h3 class="subsection-title">Namespaces</h3>
-
-        <dl>
-            <dt><a href="namespaces.html#APNG"><a href="APNG.html">APNG</a></a></dt>
-            <dd></dd>
-        </dl>
-    
 
     
 
     
 
     
-
-    
-        <h3 class="subsection-title">Events</h3>
+        <h3 class="subsection-title">Members</h3>
 
         <dl>
             
 <hr>
-<dt>
-    <h4 class="name" id="event:HelperEvent">HelperEvent</h4>
-    
+<dt class="name" id="APNGHelperOptions">
+    <h4><span class="type-signature"></span>APNGHelperOptions<span class="type-signature"></span></h4>
+
     
 </dt>
 <dd>
-
-    
-    <div class="description">
-        <p>Event object dispatched for APNG.Helper callbacks.</p>
-    </div>
     
 
-    
-
-    
-
-    
     
 
     
@@ -223,7 +190,11 @@
         <th>Type</th>
 
         
+        <th>Argument</th>
+        
 
+        
+        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -235,7 +206,7 @@
 
         <tr>
             
-                <td class="name"><code>timeStamp</code></td>
+                <td class="name"><code>options.iterations</code></td>
             
 
             <td class="type">
@@ -249,23 +220,37 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
 
+                
+                </td>
             
 
-            <td class="description last"><p>time stamp in ms. for when this event was created</p></td>
+            
+                <td class="default">
+                
+                    -1
+                
+                </td>
+            
+
+            <td class="description last"><p>number of iterations. If &gt; -1 it will override the original number of iterations</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>context</code></td>
+                <td class="name"><code>options.ignoreIterations</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">CanvasRenderingContext2D</span>
+<span class="param-type">Boolean</span>
 
 
 
@@ -273,23 +258,37 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
 
+                
+                </td>
             
 
-            <td class="description last"><p>rendering context used for this instance</p></td>
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"><p>will loop indefinitely if true (default), otherwise number of iterations is considered.</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>target</code></td>
+                <td class="name"><code>options.forceRequestAnimationFrame</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="APNG.Helper.html">APNG.Helper</a></span>
+<span class="param-type">Boolean</span>
 
 
 
@@ -297,10 +296,253 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
 
+                
+                </td>
             
 
-            <td class="description last"><p>reference to instance of helper invoking the event</p></td>
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last"><p>override timing and force use of <code>requestAnimationFrame()</code> for all frames.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options.mode</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    "forward"
+                
+                </td>
+            
+
+            <td class="description last"><p>playback mode: forward, backward, ping-pong. NOTE: These modes are not part of the Animation PNG standard.
+ They may also not be compatible will a APNG files depending on their region and dispose/blend modes.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options.debug</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last"><p>if true will draw current region rectangle, frame number, dispose and blend modes on each frame</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options.debugColorText</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    "#fff"
+                
+                </td>
+            
+
+            <td class="description last"><p>set color for debug text when debug=true</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options.debugColorRegion</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    "#f0f"
+                
+                </td>
+            
+
+            <td class="description last"><p>set color for debug rectangle when debug=true</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options.debugTextPosition</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    {x: 5, y: 12}
+                
+                </td>
+            
+
+            <td class="description last"><p>set text position if debug=true</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options.debugTextFont</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    "10px sans-serif"
+                
+                </td>
+            
+
+            <td class="description last"><p>set font for text if debug=true</p></td>
         </tr>
 
     
@@ -347,21 +589,15 @@
 
 
     
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
 </dd>
 
         </dl>
+    
+
+    
+
+    
+
     
 </article>
 

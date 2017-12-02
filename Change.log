@@ -1,6 +1,11 @@
 Change log for apng-parser
 --------------------------
 
+0.7.0
+ADD: [helper] debug option to set text font
+IMP: Internals
+FIX: Internals
+
 0.6.1
 FIX: [Helper] Spritesheet now generates correctly also when x ends exactly on right edge.
 
