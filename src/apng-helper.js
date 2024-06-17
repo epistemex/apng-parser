@@ -1,13 +1,13 @@
 /*
 	APNG Animation Helper
 
-	Copyright (c) 2017 Epistemex
+	Copyright (c) 2017, 2024 Epistemex
 	License: CC BY-NC-SA 4.0
 */
 
-"use strict";
+'use strict';
 
-APNG = APNG || {};
+const APNG = APNG || {};
 
 /**
  * Helper object to animate parsed APNG files (APNGParser objects).
@@ -23,33 +23,32 @@ APNG = APNG || {};
  */
 APNG.Helper = function(canvas, apng, options) {
 
-  options = Object.assign({
+  options = Object.assign({}, {
     iterations                : -1,
     ignoreIterations          : true,
     forceRequestAnimationFrame: false,
-    mode                      : "forward",
+    mode                      : 'forward',
     debug                     : false,
-    debugColorRegion          : "#f0f",
-    debugColorText            : "#fff",
-    debugTextPosition         : {x:5, y:12},
+    debugColorRegion          : '#f0f',
+    debugColorText            : '#fff',
+    debugTextPosition         : { x: 5, y: 12 },
     debugTextFont             : null
   }, options);
 
-  var
-    me = this,
-    temp = document.createElement("canvas"),
-    ctxt = temp.getContext("2d"),
-    ctx = canvas.getContext("2d"),
-    startTime = -1,
-    currentTime = 0,
-    frames,
-    frameInfo,
-    cFrame = 0,
-    loops = 0,
-    iterations,
-    clrBg = false,
-    commit = true,
-    timeRef;
+  const me = this;
+  const temp = document.createElement('canvas');
+  const ctxt = temp.getContext('2d');
+  let ctx = canvas.getContext('2d');
+  let startTime = -1;
+  let currentTime = 0;
+  let frames;
+  let frameInfo;
+  let cFrame = 0;
+  let loops = 0;
+  let iterations;
+  let clrBg = false;
+  let commit = true;
+  let timeRef;
 
   /**
    * The 2D context used for the canvas internally.
@@ -70,19 +69,19 @@ APNG.Helper = function(canvas, apng, options) {
    */
   this.onplay =
 
-  /**
-   * Optional callback for when an animation is stopped.
-   * @type {Function|Null}
-   * @fires HelperEvent
-   */
-  this.onstop =
+    /**
+     * Optional callback for when an animation is stopped.
+     * @type {Function|Null}
+     * @fires HelperEvent
+     */
+    this.onstop = null;
 
   /**
    * Optional callback for when an animation starts is paused.
    * @type {Function|Null}
    * @fires HelperEvent
    */
-  this.onpause =
+  this.onpause = null;
 
   /**
    * Optional callback for when an animation ended (based on number of
@@ -90,7 +89,7 @@ APNG.Helper = function(canvas, apng, options) {
    * @type {Function|Null}
    * @fires APNG.Helper#HelperEvent
    */
-  this.onended =
+  this.onended = null;
 
   /**
    * Optional callback that is called for each rendered frame.
@@ -103,7 +102,7 @@ APNG.Helper = function(canvas, apng, options) {
    * @type {Function|Null}
    * @fires APNG.Helper#HelperEvent
    */
-  this.onframe =
+  this.onframe = null;
 
   /**
    * Optional callback for when a new iteration is started.
@@ -116,24 +115,24 @@ APNG.Helper = function(canvas, apng, options) {
    * Set or get current playback mode.
    * @member {String} APNGHelper#mode
    */
-  defProp("mode",
-    function() {return options.mode},
+  defProp('mode',
+    function() {return options.mode;},
     function(mode) {
 
       frames = apng.frames.concat();
       frameInfo = apng.frameInfo.concat();
 
-      if (mode === "backward") {
+      if ( mode === 'backward' ) {
         frames.reverse();
         frameInfo.reverse();
       }
-      else if (mode === "pingpong") {
+      else if ( mode === 'pingpong' ) {
         frames = frames.concat(frames.concat().reverse());
         frameInfo = frameInfo.concat(frameInfo.concat().reverse());
       }
 
       // Make sure we are within the new length
-      if (cFrame >= frames.length) cFrame = 0;
+      if ( cFrame >= frames.length ) cFrame = 0;
       options.mode = mode;
     }
   );
@@ -154,23 +153,23 @@ APNG.Helper = function(canvas, apng, options) {
    *
    * @member {Number} APNG.Helper#currentFrame
    */
-  defProp("currentFrame",
-    function() {return cFrame},
+  defProp('currentFrame',
+    function() {return cFrame;},
     function(frame) {
-      var i = 0;
+      let i = 0;
 
-      if (frame < 0) frame = 0;
-      else if (frame >= frames.length) frame = frames.length - 1;
+      if ( frame < 0 ) frame = 0;
+      else if ( frame >= frames.length ) frame = frames.length - 1;
 
       ctx.canvas.width = canvas.width;
       cFrame = 0;
 
-      while(i++ <= frame) {
+      while( i++ <= frame ) {
         render();
         cFrame++;
       }
 
-      if (me.onframe) me.onframe(getEvent());
+      if ( me.onframe ) me.onframe(getEvent());
     }
   );
 
@@ -183,18 +182,20 @@ APNG.Helper = function(canvas, apng, options) {
    *
    * @member {Number} APNG.Helper#currentTime
    */
-  defProp("currentTime",
-    function() {return me.playing ? performance.now() - startTime : currentTime - startTime},
+  defProp('currentTime',
+    function() {return me.playing ? performance.now() - startTime : currentTime - startTime;},
     function(time) {
-      var i = 0, delta = 0;
-      while(i < frameInfo.length) {
-        delta += frameInfo[i].delay;
-        if (delta >= time) {
+      let i = 0;
+      let delta = 0;
+
+      while( i < frameInfo.length ) {
+        delta += frameInfo[ i ].delay;
+        if ( delta >= time ) {
           me.currentFrame = i;
-          if (me.onframe) me.onframe(getEvent());
-          return
+          if ( me.onframe ) me.onframe(getEvent());
+          return;
         }
-        i++
+        i++;
       }
     }
   );
@@ -206,7 +207,7 @@ APNG.Helper = function(canvas, apng, options) {
    *
    * @member {Number} APNG.Helper#duration
    */
-  defProp("duration", function() {return apng.duration});
+  defProp('duration', function() {return apng.duration;});
 
   /**
    * This property can be set to false when for example the canvas is not
@@ -216,12 +217,12 @@ APNG.Helper = function(canvas, apng, options) {
    * Note: This also blocks calls to onframe callbacks.
    * @member {boolean} APNG.Helper#commit
    */
-  defProp("commit",
-    function() {return commit},
+  defProp('commit',
+    function() {return commit;},
     function(state) {
-      var prevState = commit;
+      const prevState = commit;
       commit = !!state;
-      if (!prevState && commit) me.currentFrame = cFrame;
+      if ( !prevState && commit ) me.currentFrame = cFrame;
     }
   );
 
@@ -229,27 +230,27 @@ APNG.Helper = function(canvas, apng, options) {
    * Enable or disable debugging.
    * @member {boolean} APNG.Helper#debug
    */
-  defProp("debug",
-    function() {return options.debug},
-    function(state) {options.debug = !!state}
+  defProp('debug',
+    function() {return options.debug;},
+    function(state) {options.debug = !!state;}
   );
 
   /**
    * Set color of text if debugging is enabled.
    * @member {boolean} APNG.Helper#debugColorText
    */
-  defProp("debugColorText",
-    function() {return ctx.fillStyle},
-    function(color) {ctx.fillStyle = color}
+  defProp('debugColorText',
+    function() {return ctx.fillStyle;},
+    function(color) {ctx.fillStyle = color;}
   );
 
   /**
    * Set color of region rectangle if debugging is enabled.
    * @member {boolean} APNG.Helper#debugColorRegion
    */
-  defProp("debugColorRegion",
-    function() {return ctx.strokeStyle},
-    function(color) {ctx.strokeStyle = color}
+  defProp('debugColorRegion',
+    function() {return ctx.strokeStyle;},
+    function(color) {ctx.strokeStyle = color;}
   );
 
   /**
@@ -257,18 +258,18 @@ APNG.Helper = function(canvas, apng, options) {
    * The argument is an object with properties for x and y.
    * @member {Object} APNG.Helper#debugTextPosition
    */
-  defProp("debugTextPosition",
-    function() {return options.debugTextPosition},
-    function(pos) {options.debugTextPosition = pos}
+  defProp('debugTextPosition',
+    function() {return options.debugTextPosition;},
+    function(pos) {options.debugTextPosition = pos;}
   );
 
   /**
    * Set font for text for frame information if debugging is enabled.
    * @member {string} APNG.Helper#debugTextFont
    */
-  defProp("debugTextFont",
-    function() {return ctx.font},
-    function(font) {ctx.font = font}
+  defProp('debugTextFont',
+    function() {return ctx.font;},
+    function(font) {ctx.font = font;}
   );
 
   /**
@@ -276,17 +277,17 @@ APNG.Helper = function(canvas, apng, options) {
    * reset and resized to match the APNG.
    * @member {boolean} APNG.Helper#canvas
    */
-  defProp("canvas",
-    function() {return canvas},
+  defProp('canvas',
+    function() {return canvas;},
     function(newCanvas) {
       canvas = newCanvas;
-      me.context = ctx = canvas.getContext("2d");
-      if (!ctx) throw "This canvas cannot be used for 2D.";
+      me.context = ctx = canvas.getContext('2d');
+      if ( !ctx ) throw 'This canvas cannot be used for 2D.';
       canvas.width = apng.width;
       canvas.height = apng.height;
 
       // init debug settings
-      if (options.debugTextFont) ctx.font = options.debugTextFont;
+      if ( options.debugTextFont ) ctx.font = options.debugTextFont;
       ctx.fillStyle = options.debugColorText;
       ctx.strokeStyle = options.debugColorRegion;
     }
@@ -298,21 +299,21 @@ APNG.Helper = function(canvas, apng, options) {
    * has been played.
    */
   this.play = function() {
-    if (!me.playing) play();
+    if ( !me.playing ) play();
   };
 
   /**
    * Stop animation and go to frame 0.
    */
   this.stop = function() {
-    if (!me.playing) return;
+    if ( !me.playing ) return;
 
     me.pause();
     cFrame = 0;
     startTime = -1;
     render();
 
-    if (me.onstop)
+    if ( me.onstop )
       me.onstop(getEvent());
   };
 
@@ -320,14 +321,14 @@ APNG.Helper = function(canvas, apng, options) {
    * Pause animation at current frame.
    */
   this.pause = function() {
-    if (!me.playing) return;
+    if ( !me.playing ) return;
 
     me.playing = false;
 
     clearTimeout(timeRef);
     cancelAnimationFrame(timeRef);
 
-    if (me.onpause)
+    if ( me.onpause )
       me.onpause(getEvent());
   };
 
@@ -338,16 +339,16 @@ APNG.Helper = function(canvas, apng, options) {
   \*-----------------------------------------------------------------------------------------------------------------*/
 
   function play() {
-    var perf = performance.now.bind(performance);
+    const perf = performance.now.bind(performance);
 
     me.playing = true;
 
     // render frame, invoke advance
     function loop() {
-      var info = frameInfo[cFrame];
-      if (commit) {
+      const info = frameInfo[ cFrame ];
+      if ( commit ) {
         render();
-        if (me.onframe) me.onframe(getEvent());
+        if ( me.onframe ) me.onframe(getEvent());
       }
 
       timeRef = (info.delay >= 16 && info.delay <= 17) || options.forceRequestAnimationFrame ?
@@ -356,26 +357,26 @@ APNG.Helper = function(canvas, apng, options) {
 
     // loop progress
     function advance() {
-      if (++cFrame >= frames.length) {
+      if ( ++cFrame >= frames.length ) {
         cFrame = 0;
         startTime = perf();
         loops++;
-        if (me.oniteration) me.oniteration(getEvent());
-        if (loops >= iterations && !options.ignoreIterations) {
+        if ( me.oniteration ) me.oniteration(getEvent());
+        if ( loops >= iterations && !options.ignoreIterations ) {
           me.playing = false;
-          if (me.onended) me.onended(getEvent());
+          if ( me.onended ) me.onended(getEvent());
         }
       }
 
       // render next frame
       currentTime = perf();
-      if (me.playing) loop();
+      if ( me.playing ) loop();
     }
 
     startTime = perf();
     loop();
 
-    if (me.onplay)
+    if ( me.onplay )
       me.onplay(getEvent());
   }
 
@@ -385,46 +386,46 @@ APNG.Helper = function(canvas, apng, options) {
    */
   function render() {
 
-    var frame = frames[cFrame],
-        info = frameInfo[cFrame];
+    const frame = frames[ cFrame ];
+    const info = frameInfo[ cFrame ];
 
     // was previous frame using dispose method 2?
-    if (clrBg) {
+    if ( clrBg ) {
       ctx.drawImage(temp, 0, 0);
       clrBg = false;
     }
 
     // check dispose function
-    if (info.dispose === 1) {
-      ctx.clearRect(info.x|0, info.y|0, info.width|0, info.height|0)
+    if ( info.dispose === 1 ) {
+      ctx.clearRect(info.x | 0, info.y | 0, info.width | 0, info.height | 0);
     }
-    else if (info.dispose === 2) {
-      ctxt.clearRect(0, 0, temp.width|0, temp.height|0);
-      ctxt.drawImage(canvas, info.x|0, info.y|0, info.width|0, info.height|0, info.x|0, info.y|0, info.width|0, info.height|0);
+    else if ( info.dispose === 2 ) {
+      ctxt.clearRect(0, 0, temp.width | 0, temp.height | 0);
+      ctxt.drawImage(canvas, info.x | 0, info.y | 0, info.width | 0, info.height | 0, info.x | 0, info.y | 0, info.width | 0, info.height | 0);
       clrBg = true;
     }
 
     // check blend op.
-    if (info.blend === 0)
-      ctx.clearRect(info.x|0, info.y|0, info.width|0, info.height|0);
+    if ( info.blend === 0 )
+      ctx.clearRect(info.x | 0, info.y | 0, info.width | 0, info.height | 0);
 
     // render frame
-    ctx.drawImage(frame, info.x|0, info.y|0);
+    ctx.drawImage(frame, info.x | 0, info.y | 0);
 
     // debug info?
-    if (options.debug) {
-      ctx.strokeRect((info.x|0)+0.5, (info.y|0)+0.5, (info.width-1)|0, (info.height-1)|0);
-      ctx.fillText("F:" + cFrame + "  D:" + info.dispose +  "  B:" + info.blend, options.debugTextPosition.x, options.debugTextPosition.y);
+    if ( options.debug ) {
+      ctx.strokeRect((info.x | 0) + 0.5, (info.y | 0) + 0.5, (info.width - 1) | 0, (info.height - 1) | 0);
+      ctx.fillText('F:' + cFrame + '  D:' + info.dispose + '  B:' + info.blend, options.debugTextPosition.x, options.debugTextPosition.y);
     }
   }
 
   function getEvent() {
-    return {timeStamp: Date.now(), context: ctx, target: me}
+    return { timeStamp: Date.now(), context: ctx, target: me };
   }
 
   function defProp(name, getter, setter) {
-    var def = {get: getter};
-    if (setter) def.set = setter;
+    const def = { get: getter };
+    if ( setter ) def.set = setter;
     Object.defineProperty(me, name, def);
   }
 
@@ -439,19 +440,19 @@ APNG.Helper = function(canvas, apng, options) {
   canvas.height = temp.height = apng.height;
 
   iterations = options.iterations < 0 ?                                 // if option no. < 0 then ignore option and use original
-                 apng.iterations : options.iterations;
+               apng.iterations : options.iterations;
 
-  if (!iterations) {
+  if ( !iterations ) {
     options.ignoreIterations = true;                                    // 0 means infinite iterations
   }
-  else if (iterations < 0) {                                            // if we still have -1 (single frame from original PNG)
+  else if ( iterations < 0 ) {                                          // if we still have -1 (single frame from original PNG)
     options.ignoreIterations = !!(iterations = 0);                      // don't ignore iterations, but use 0 so we only render one frame and stop
   }
 
   // Init debug colors
   ctx.fillStyle = options.debugColorText;
   ctx.strokeStyle = options.debugColorRegion;
-  if (options.debugTextFont) ctx.font = options.debugTextFont;
+  if ( options.debugTextFont ) ctx.font = options.debugTextFont;
 
   // Init playback mode (!)
   me.mode = options.mode;                                               // this call also sets up frames/info arrays
@@ -472,42 +473,42 @@ APNG.Helper = function(canvas, apng, options) {
  */
 APNG.Helper.toSpritesheet = function(apng, options) {
 
-  options = Object.assign({
+  options = Object.assign({}, {
     maxWidth    : 6000,
     drawCallback: null
   }, options);
 
-  var c1 = document.createElement("canvas"),                            // internal canvas for helper
-      c2 = document.createElement("canvas"),                            // final canvas sprite-sheet
-      ctx = c2.getContext("2d"),
-      anim = new APNG.Helper(c1, apng),                                 // temporary instance
-      cnt;
+  const c1 = document.createElement('canvas');                         // internal canvas for helper
+  const c2 = document.createElement('canvas');                         // final canvas sprite-sheet
+  const ctx = c2.getContext('2d');
+  const anim = new APNG.Helper(c1, apng);                                       // temporary instance
+  let cnt;
 
-  if (options.drawCallback)
+  if ( options.drawCallback )
     anim.onframe = options.drawCallback;
 
-  if (apng.width * apng.frames.length > options.maxWidth) {             // too many cells to fit horizontally?
-    cnt = Math.floor(options.maxWidth / apng.width);                    // get number of cells horizontally
-    c2.width = cnt * apng.width;                                        // get an actual width based on count
+  if ( apng.width * apng.frames.length > options.maxWidth ) {                   // too many cells to fit horizontally?
+    cnt = Math.floor(options.maxWidth / apng.width);                         // get number of cells horizontally
+    c2.width = cnt * apng.width;                                                // get an actual width based on count
     c2.height = Math.ceil((apng.width * (apng.frames.length)) / options.maxWidth) * apng.height; // get actual height
   }
   else {
-    c2.width = apng.width * apng.frames.length;                         // single row, size of sprite-sheet
+    c2.width = apng.width * apng.frames.length;                                 // single row, size of sprite-sheet
     c2.height = apng.height;
   }
 
   // Render the cells
-  for(var i = 0, x = 0, y = 0; i < apng.frames.length; i++) {
+  for(let i = 0, x = 0, y = 0; i < apng.frames.length; i++) {
     anim.currentFrame = i;
     ctx.drawImage(c1, x, y);
     x += apng.width;
-    if (x >= options.maxWidth) {
+    if ( x >= options.maxWidth ) {
       x = 0;
       y += apng.height;
     }
   }
 
-  return ctx.canvas
+  return ctx.canvas;
 };
 
 /**
@@ -517,7 +518,7 @@ APNG.Helper.toSpritesheet = function(apng, options) {
  * @static
  */
 APNG.Helper.retime = function(apng, timeScale) {
-  this._cd(function(info) {info.delay *= timeScale});
+  this._cd(function(info) {info.delay *= timeScale;});
 };
 
 /**
@@ -531,8 +532,8 @@ APNG.Helper.retime = function(apng, timeScale) {
  * @static
  */
 APNG.Helper.setDuration = function(apng, duration) {
-  var timeScale = duration / apng.duration;
-  this._cd(function(info) {info.delay *= timeScale});
+  const timeScale = duration / apng.duration;
+  this._cd(function(info) {info.delay *= timeScale;});
 };
 
 /**
@@ -544,7 +545,7 @@ APNG.Helper.setDuration = function(apng, duration) {
  * @static
  */
 APNG.Helper.setDelay = function(apng, delay) {
-  this._cd(function(info) {info.delay = delay});
+  this._cd(function(info) {info.delay = delay;});
 };
 
 /**
@@ -553,9 +554,9 @@ APNG.Helper.setDelay = function(apng, delay) {
  * @private
  */
 APNG.Helper._cd = function(fn) {
-  var fi = apng.frameInfo;
+  const fi = apng.frameInfo;
   fi.forEach(fn);
-  apng.duration = fi.reduce(function(prev, curr) {return prev + curr.delay}, 0);
+  apng.duration = fi.reduce(function(prev, curr) {return prev + curr.delay;}, 0);
 };
 
 /**

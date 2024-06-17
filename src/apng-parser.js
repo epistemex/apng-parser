@@ -1,19 +1,19 @@
 /*!
 	APNG Parser ver 0.7.0 alpha
-	Copyright (c) 2017 Epistemex.com
+	Copyright (c) 2017, 2024 Epistemex.com
 	License: CC BY-NC-SA 4.0
 */
 
-"use strict";
+'use strict';
 
 /**
  * APNG holds objects to parse, animate and [build] animated PNG files.
  * @namespace APNG
  */
-var APNG = APNG || {};
+const APNG = APNG || {};
 
 /**
- * Parses a Animated PNG (APNG) into raw frames (images) which can be
+ * Parses an Animated PNG (APNG) into raw frames (images) which can be
  * used for "manual" animation, frame extraction, analyze and optimization
  * purposes.
  *
@@ -27,32 +27,31 @@ var APNG = APNG || {};
  */
 APNG.Parser = function(input, callback, onerror) {
 
-  var
-    me = this,
-    table,
-    fileReader,
-    mimeType = {type: "image/png"};
+  const me = this;
+  let table;
+  let fileReader;
+  let mimeType = { type: 'image/png' };
 
   // bind callback for "this"
-  callback = callback.bind(me);
+  callback = callback.bind(this);
 
   /**
    * Width of animation in pixels
    * @type {number}
    */
-  this.width =
+  this.width = 0;
 
   /**
    * Height of animation in pixels
    * @type {number}
    */
-  this.height =
+  this.height = 0;
 
   /**
    * Number of iterations (loops) defined in animation header chunk.
    * @type {number}
    */
-  this.iterations =
+  this.iterations = 0;
 
   /**
    * Duration of animation in milliseconds.
@@ -89,24 +88,24 @@ APNG.Parser = function(input, callback, onerror) {
 
   \*-----------------------------------------------------------------------------------------------------------------*/
 
-  if (input instanceof Blob || input instanceof File) {
+  if ( input instanceof Blob || input instanceof File ) {
     fileReader = new FileReader();
     fileReader.onload = function() {
       parseBuffer(this.result);
     };
     fileReader.onerror = onerror || null;
-    fileReader.readAsArrayBuffer(input)
+    fileReader.readAsArrayBuffer(input);
   }
-  else if (typeof input === "string") {
-    fetch(input).then(function(resp) {return resp.arrayBuffer()}).then(parseBuffer);
+  else if ( typeof input === 'string' ) {
+    fetch(input).then(function(resp) {return resp.arrayBuffer();}).then(parseBuffer);
   }
-  else if (ArrayBuffer.isView(input)) {
+  else if ( ArrayBuffer.isView(input) ) {
     parseBuffer(input.buffer);
   }
-  else if (input instanceof ArrayBuffer) {
+  else if ( input instanceof ArrayBuffer ) {
     parseBuffer(input);
   }
-  else throw "Unknown input type";
+  else throw 'Unknown input type';
 
   /*-----------------------------------------------------------------------------------------------------------------*\
 
@@ -116,31 +115,31 @@ APNG.Parser = function(input, callback, onerror) {
 
   function parseBuffer(buffer) {
 
-    var
-      view = new DataView(buffer),
-      pos = 0,
-      frames = 0,
-      chunks = [];
+    const view = new DataView(buffer);
+    const chunks = [];
+    let pos = 0;
+    let frames = 0;
 
     // validate PNG header
-    if (getU32() !== 0x89504E47 || getU32() !== 0x0D0A1A0A)
-      throw "Not a (A)PNG file.";
+    if ( getU32() !== 0x89504E47 || getU32() !== 0x0D0A1A0A ) {
+      throw new Error('Not a (A)PNG file.');
+    }
 
     // Get full size of image
     me.width = view.getUint32(16);
     me.height = view.getUint32(20);
 
     // Parse chunks
-    while(pos < buffer.byteLength) {
-      var chunk = {
-            size: getU32(),
-            name: getFourCC(),
-            pos : pos
-          };
+    while( pos < buffer.byteLength ) {
+      const chunk = {
+        size: getU32(),
+        name: getFourCC(),
+        pos : pos
+      };
 
       chunks.push(chunk);
 
-      if (chunk.name === "acTL") me.isAPNG = true;
+      if ( chunk.name === 'acTL' ) me.isAPNG = true;
       pos += chunk.size + 4;                                            // skip to next chunk skipping CRC32
     }
 
@@ -150,79 +149,79 @@ APNG.Parser = function(input, callback, onerror) {
 
     \*---------------------------------------------------------------------------------------------------------------*/
 
-    if (me.isAPNG) {
-
-      var
-        parts = null,                                                   // image data parts (IDAT, fdAT) for each file
-        fcCount = 0,                                                    // check fcTL chunk count, compare with frames
-        seqLast = 0, seqNo, errOutOfOrder = false,                      // detect out-of-order APNGs
-        fctlBeforeIDAT = false,                                         // for IDAT chunk, if true IDAT is part of anim.
-        duration = 0,                                                   // track total duration
-        files = [],                                                     // data separated for each PNG file
-        header = [],                                                    // common headers for each file (will have modified IDAT)
-        headerChunks = [                                                // chunks we want to bring over to each individual PNG file
-          "IHDR", "PLTE", "gAMA", "pHYs", "tRNS", "iCCP", "sRGB", "sBIT", "sPLT"
-        ];
+    if ( me.isAPNG ) {
+      let parts = null;                                   // image data parts (IDAT, fdAT) for each file
+      let fcCount = 0;                                    // check fcTL chunk count, compare with frames
+      let seqLast = 0, seqNo, errOutOfOrder = false;      // detect out-of-order APNGs
+      let fctlBeforeIDAT = false;                         // for IDAT chunk, if true IDAT is part of anim.
+      let duration = 0;                                   // track total duration
+      const files = [];                                   // data separated for each PNG file
+      const header = [];                                  // common headers for each file (will have modified IDAT)
+      const headerChunks = [                              // chunks we want to bring over to each individual PNG file
+        'IHDR', 'PLTE', 'gAMA', 'pHYs', 'tRNS', 'iCCP', 'sRGB', 'sBIT', 'sPLT'
+      ];
 
       // Iterate over each chunk to extract animation data
       chunks.forEach(function(chunk) {
 
         // build common header (size for header updated in blob)
-        if (headerChunks.indexOf(chunk.name) > -1) {
+        if ( headerChunks.indexOf(chunk.name) > -1 ) {
           header.push(chunk);
         }
 
         // Should only occur once, holds number of frames and iterations
-        else if (chunk.name === "acTL") {
+        else if ( chunk.name === 'acTL' ) {
           pos = chunk.pos;
           frames = getU32();
           me.iterations = getU32();
         }
 
         // Frame control chunk hold offset, region size and timing data
-        else if (chunk.name === "fcTL") {
+        else if ( chunk.name === 'fcTL' ) {
           fcCount++;
-          if (parts) files.push(parts);                                 // push previous parts if any
-          parts = [];                                                   // initialize for new parts
+          if ( parts ) files.push(parts);                                       // push previous parts if any
+          parts = [];                                                           // initialize for new parts
           fctlBeforeIDAT = true;
-          pos = chunk.pos;                                              // skip sequence no.
+          pos = chunk.pos;                                                      // skip sequence no.
 
           seqNo = getU32();
 
-          if (seqNo >= seqLast)
+          if ( seqNo >= seqLast ) {
             seqLast = seqNo;
-          else
+          }
+          else {
             errOutOfOrder = true;
+          }
 
           me.frameInfo.push({
             width  : getU32(),
             height : getU32(),
             x      : getU32(),
             y      : getU32(),
-            delay  : getU16() / (getU16() || 1) * 1000,                   // convert to ms.
+            delay  : getU16() / (getU16() || 1) * 1000,                         // convert to ms.
             dispose: getU8(),
             blend  : getU8()
           });
 
           // correct the time if denominator === 0, as per specs
-          if (view.getUint16(pos - 4) === 0)
-            me.frameInfo[me.frameInfo.length - 1].delay = 10;
+          if ( view.getUint16(pos - 4) === 0 )
+            me.frameInfo[ me.frameInfo.length - 1 ].delay = 10;
 
           // add to duration
-          duration += me.frameInfo[me.frameInfo.length - 1].delay;
+          duration += me.frameInfo[ me.frameInfo.length - 1 ].delay;
         }
 
         // A regular IDAT, if preceded by a fcTL chunk it is considered part of the animation
-        else if (chunk.name === "IDAT") {
-          if (fctlBeforeIDAT) {
+        else if ( chunk.name === 'IDAT' ) {
+          if ( fctlBeforeIDAT ) {
             parts.push(new Uint8Array(view.buffer, chunk.pos, chunk.size));
           }
         }
 
         // Image data for frame, holds sequence number (ignored) followed by regular IDAT image data
-        else if (chunk.name === "fdAT") {
+        else if ( chunk.name === 'fdAT' ) {
           seqNo = view.getUint32(chunk.pos);
-          if (seqNo >= seqLast)
+          if ( seqNo >= seqLast )
             seqLast = seqNo;
           else
             errOutOfOrder = true;
@@ -232,7 +231,7 @@ APNG.Parser = function(input, callback, onerror) {
       });
 
       // add final part
-      if (parts) files.push(parts);
+      if ( parts ) files.push(parts);
 
       // publish duration
       me.duration = duration;
@@ -241,8 +240,8 @@ APNG.Parser = function(input, callback, onerror) {
       //if (me.frameInfo[0].dispose === 2); // DISCUSS as the goal is not so much to validate APNGs but parsing
       //  me.frameInfo[0].dispose = 1;      // them as-is, we should assume this is correct from producer (?).
 
-      if (fcCount !== frames || errOutOfOrder) // todo: improve all error handling (target: beta)
-        console.log("Warning: The APNG contains errors and may not playback correctly.");
+      if ( fcCount !== frames || errOutOfOrder ) // todo: improve all error handling (target: beta)
+        console.log('Warning: The APNG contains errors and may not play back correctly.');
 
       /*-------------------------------------------------------------------------------------------------------------*\
 
@@ -256,27 +255,26 @@ APNG.Parser = function(input, callback, onerror) {
       files.forEach(function(file, index) {
 
         // PNG header
-        var
-          list = [new Uint32Array([0x474E5089, 0xA1A0A0D])],
-          info = me.frameInfo[index],
-          blob, url, img;
+        const info = me.frameInfo[ index ];
+        let list = [ new Uint32Array([ 0x474E5089, 0xA1A0A0D ]) ];
+        let blob, url, img;
 
         // copy and modify existing chunks
-        if (chunks[0].name !== "IHDR")
-          throw "Error in PNG. IHDR not in correct position.";
+        if ( chunks[ 0 ].name !== 'IHDR' )
+          throw 'Error in PNG. IHDR not in correct position.';
 
         // Copy each base chunks into new blob
         header.forEach(function(chunk) {
 
-          var dv, ihdr;
+          let dv, ihdr;
 
           // We need to reflect region size in the IHDR and recalculate CRC32
-          if (chunk.name === "IHDR") {
+          if ( chunk.name === 'IHDR' ) {
             dv = new DataView(view.buffer, chunk.pos, chunk.size);
             dv.setUint32(0, info.width);
             dv.setUint32(4, info.height);
 
-            ihdr = makeChunk("IHDR", new Uint8Array(view.buffer, chunk.pos, chunk.size));
+            ihdr = makeChunk('IHDR', new Uint8Array(view.buffer, chunk.pos, chunk.size));
             list.push(ihdr);
           }
 
@@ -289,11 +287,11 @@ APNG.Parser = function(input, callback, onerror) {
         // Image data chunks (can be multiple per file) data added, converted to IDAT with new CRC32
         // Can also be merged into a single chunk but need more temp memory and is slower due to the additional copy process.
         file.forEach(function(part) {
-          list.push(makeChunk("IDAT", part));
+          list.push(makeChunk('IDAT', part));
         });
 
         // push final IEND chunk
-        list.push(new Uint32Array([0, 0x444e4549, 0x826042ae]));
+        list.push(new Uint32Array([ 0, 0x444e4549, 0x826042ae ]));
 
         /*-----------------------------------------------------------------------------------------------------------*\
 
@@ -314,14 +312,14 @@ APNG.Parser = function(input, callback, onerror) {
 
         function loadHandler() {
           URL.revokeObjectURL(this.src);
-          if (index === frames - 1) callback();                         // DONE!
+          if ( index === frames - 1 ) callback();                         // DONE!
         }
 
         function errorHandler() {
-          if (onerror) {
-            onerror("Internal error producing PNG.")
+          if ( onerror ) {
+            onerror('Internal error producing PNG.');
           }
-          else if (index === frames - 1)
+          else if ( index === frames - 1 )
             callback();
         }
       });
@@ -336,7 +334,7 @@ APNG.Parser = function(input, callback, onerror) {
       \*-----------------------------------------------------------------------------------------------------------*/
 
       me.frames.push(new Image);
-      me.frames[0].onload = function() {
+      me.frames[ 0 ].onload = function() {
         URL.revokeObjectURL(this.src);
         me.frameInfo.push({
           x      : 0,
@@ -349,7 +347,7 @@ APNG.Parser = function(input, callback, onerror) {
         });
         callback();
       };
-      me.frames[0].src = URL.createObjectURL(new Blob([buffer], mimeType))
+      me.frames[ 0 ].src = URL.createObjectURL(new Blob([ buffer ], mimeType));
     }
 
     /*-----------------------------------------------------------------------------------------------------------*\
@@ -363,35 +361,35 @@ APNG.Parser = function(input, callback, onerror) {
     }
 
     function getU16() {
-      var v = view.getUint16(pos);
+      const v = view.getUint16(pos);
       pos += 2;
-      return v
+      return v;
     }
 
     function getU32() {
-      var v = view.getUint32(pos);
+      const v = view.getUint32(pos);
       pos += 4;
-      return v
+      return v;
     }
 
     function getFourCC() {
-      var v = getU32(), c = String.fromCharCode;
+      const v = getU32();
+      const c = String.fromCharCode;
       return c(v >>> 24) + c(v >> 16 & 0xff) + c(v >> 8 & 0xff) + c(v & 0xff);
     }
   }
 
   // Build a CRC32 LUT-table for makeChunk()
   function buildCRC() {
-    var
-      table = new Uint32Array(256),
-      i = 0, j, crc;
+    const table = new Uint32Array(256);
+    let i = 0, j, crc;
 
-    while(i < 256) {
-      crc = i>>>0;
-      for (j = 0; j < 8; j++) crc = (crc & 1) ? 0xedb88320 ^ (crc >>> 1) : crc >>> 1;
-      table[i++] = crc
+    while( i < 256 ) {
+      crc = i >>> 0;
+      for(j = 0; j < 8; j++) crc = (crc & 1) ? 0xedb88320 ^ (crc >>> 1) : crc >>> 1;
+      table[ i++ ] = crc;
     }
-    return table
+    return table;
   }
 
   /**
@@ -405,9 +403,8 @@ APNG.Parser = function(input, callback, onerror) {
    */
   function makeChunk(name, data) {
 
-    var
-      chunk = new Uint8Array(data.length + 12),
-      dv = new DataView(chunk.buffer);
+    const chunk = new Uint8Array(data.length + 12);
+    const dv = new DataView(chunk.buffer);
 
     dv.setUint32(0, data.length);
     dv.setUint32(4, makeFourCC(name));
@@ -415,20 +412,19 @@ APNG.Parser = function(input, callback, onerror) {
     dv.setUint32(chunk.length - 4, calcCRC(chunk));
 
     function makeFourCC(n) {
-      var c = n.charCodeAt.bind(n);
-      return c(0)<<24 | (c(1) & 0xff)<<16 | (c(2) & 0xff)<<8 | c(3) & 0xff
+      const c = n.charCodeAt.bind(n);
+      return c(0) << 24 | (c(1) & 0xff) << 16 | (c(2) & 0xff) << 8 | c(3) & 0xff;
     }
 
     function calcCRC(buffer) {
-      var
-        crc = (-1>>>0),
-        len = buffer.length - 4,
-        i = 4;
+      const len = buffer.length - 4;
+      let crc = (-1 >>> 0);
+      let i = 4;
 
-      while(i < len) crc = (crc >>> 8) ^ table[(crc ^ buffer[i++]) & 0xff];
-      return crc ^ -1
+      while( i < len ) crc = (crc >>> 8) ^ table[ (crc ^ buffer[ i++ ]) & 0xff ];
+      return crc ^ -1;
     }
 
-    return chunk
+    return chunk;
   }
 };
