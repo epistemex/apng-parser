@@ -1,5 +1,5 @@
 /*!
-	APNG Parser ver 0.7.0 alpha
+	APNG Parser ver 0.8.0 beta
 	Copyright (c) 2017, 2024 Epistemex.com
 	License: CC BY-NC-SA 4.0
 */
