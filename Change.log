@@ -1,6 +1,9 @@
 Change log for apng-parser
 --------------------------
 
+0.8.0-beta
+Changes are from now on in the git log itself.
+
 0.7.0
 ADD: [helper] debug option to set text font
 IMP: Internals
