@@ -7,8 +7,6 @@
 
 'use strict';
 
-const APNG = APNG || {};
-
 /**
  * Helper object to animate parsed APNG files (APNGParser objects).
  *

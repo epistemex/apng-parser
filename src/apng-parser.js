@@ -1,5 +1,5 @@
 /*!
-	APNG Parser ver 0.8.0 beta
+	APNG Parser ver 0.8.1 beta
 	Copyright (c) 2017, 2024 Epistemex.com
 	License: CC BY-NC-SA 4.0
 */
@@ -10,7 +10,7 @@
  * APNG holds objects to parse, animate and [build] animated PNG files.
  * @namespace APNG
  */
-const APNG = APNG || {};
+const APNG = {};
 
 /**
  * Parses an Animated PNG (APNG) into raw frames (images) which can be
