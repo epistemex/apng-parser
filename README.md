@@ -2,7 +2,7 @@
 ===========
 
 Parse Animated PNG files into single frames that can be used for 
-animation and analyzis.
+animation and analysis.
 
 The package comes with a handy animation helper object that can handle 
 the animation, render out a single frame correctly, provide events for 
@@ -68,8 +68,6 @@ License
 
 [![License](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
-[Contact us](mailto:github@epistemex.com) if you need a commercial license.
-
-*&copy; Epistemex 2017*
+*&copy; Epistemex 2017, 2024*
  
-![Epistemex](http://i.imgur.com/GP6Q3v8.png)
+![Epistemex](https://i.imgur.com/GP6Q3v8.png)
